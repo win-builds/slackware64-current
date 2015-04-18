@@ -62,7 +62,6 @@ find . \
 patch -p0 --verbose < $CWD/CVE-2014-8964-fix-zero-repeated-assertion-as-condition-bug.patch
 
 CFLAGS="-O2" \
-LDFLAGS="-L/${PREFIX}/lib${LIBDIRSUFFIX}" \
 ./configure \
   --prefix=/${PREFIX} \
   --libdir=/${PREFIX}/lib${LIBDIRSUFFIX} \
@@ -73,13 +72,12 @@ LDFLAGS="-L/${PREFIX}/lib${LIBDIRSUFFIX}" \
   --enable-unicode-properties \
   --disable-static \
   --host=${HOST_TRIPLET} \
-  --build=$ARCH-slackware-linux
+  --build=${BUILD_TRIPLET}
 
 CFLAGS="-O2" make $NUMJOBS || make || exit 1
 make install DESTDIR=$PKG || exit 1
 
-chmod 755 $PKG/${PREFIX}/lib${LIBDIRSUFFIX}/libpcre.so.* \
-  $PKG/${PREFIX}/lib${LIBDIRSUFFIX}/libpcreposix.so.*
+chmod 755 $PKG/${PREFIX}/bin/lib{pcre,pcreposix}*.dll
 
 find $PKG | xargs file | egrep -e "executable|shared object" \
   | grep ${HOST_EXE_FORMAT} | cut -f 1 -d : \
@@ -108,7 +106,7 @@ mkdir -p $PKG/${PREFIX}/doc/pcre-$VERSION
 cp -a \
   AUTHORS COPYING* INSTALL HACKING LICENCE NEWS NON-UNIX-USE README* \
   $PKG/${PREFIX}/doc/pcre-$VERSION
-( cd doc ; cp -a Tech.Notes html $PKG/${PREFIX}/doc/pcre-$VERSION )
+( cd doc ; cp -a html $PKG/${PREFIX}/doc/pcre-$VERSION )
 
 # If there's a ChangeLog, installing at least part of the recent history
 # is useful, but don't let it get totally out of control:
