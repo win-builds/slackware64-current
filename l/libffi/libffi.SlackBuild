@@ -27,29 +27,20 @@ PKGNAM=libffi
 VERSION=${VERSION:-$(echo $PKGNAM-*.tar.?z* | rev | cut -f 3- -d . | cut -f 1 -d - | rev)}
 BUILD=${BUILD:-2}
 
-# Automatically determine the architecture we're building on:
-if [ -z "$ARCH" ]; then
-  case "$(uname -m)" in
-    i?86) ARCH=i486 ;;
-    arm*) readelf /${PREFIX}/bin/file -A | egrep -q "Tag_CPU.*[4,5]" && ARCH=arm || ARCH=armv7lh ;;
-    # Unless $ARCH is already set, use uname -m for all other archs:
-    *) ARCH=$(uname -m) ;;
-  esac
-  export ARCH
-fi
-
 CWD=$(pwd)
 TMP=${TMP:-/tmp}
 PKG=$TMP/package-$PKGNAM
+
+set -e
 
 rm -rf $PKG
 mkdir -p $TMP $PKG
 cd $TMP
 rm -rf $PKGNAM-$VERSION
-tar xvf $CWD/$PKGNAM-$VERSION.tar.xz || exit 1
+tar xvf $CWD/$PKGNAM-$VERSION.tar.xz
 cd $PKGNAM-$VERSION
 
-zcat $CWD/libffi.includedir.diff.gz | patch -p1 --verbose || exit 1
+zcat $CWD/libffi.includedir.diff.gz | patch -p1 --verbose
 
 chown -R root:root .
 find . \
@@ -60,7 +51,6 @@ find . \
 
 CFLAGS="-O2" \
 CXXFLAGS="-O2" \
-LDFLAGS="-L/${PREFIX}/lib${LIBDIRSUFFIX}" \
 ./configure \
   --prefix=/${PREFIX} \
   --libdir=/${PREFIX}/lib${LIBDIRSUFFIX} \
@@ -71,13 +61,13 @@ LDFLAGS="-L/${PREFIX}/lib${LIBDIRSUFFIX}" \
   --docdir=/${PREFIX}/doc/$PKGNAM-$VERSION \
   --disable-static \
   --host=${HOST_TRIPLET} \
-  --build=$ARCH-slackware-linux || exit 1
+  --build=${BUILD_TRIPLET}
 
 find -name 'Makefile' \
   -exec sed -i 's;\(toolexeclibdir = $(libdir)\)/../lib;\1;' {} +
 
-make -j7 || exit 1
-make install DESTDIR=$PKG || exit 1
+make -j7 || make V=1
+make install DESTDIR=$PKG
 
 # Strip binaries:
 ( cd $PKG
