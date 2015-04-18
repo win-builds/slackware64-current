@@ -95,7 +95,7 @@ LDFLAGS="-L/${PREFIX}/lib${LIBDIRSUFFIX}" \
 
 make $NUMJOBS || make || exit 1
 
-make install \
+make -j1 install \
   RUN_QUERY_IMMODULES_TEST=false RUN_QUERY_LOADER_TEST=false \
   DESTDIR=$PKG \
   || exit 1
