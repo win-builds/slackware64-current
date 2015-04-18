@@ -24,43 +24,36 @@ PKGNAM=pkg-config
 VERSION=${VERSION:-$(echo $PKGNAM-*.tar.?z* | rev | cut -f 3- -d . | cut -f 1 -d - | rev)}
 BUILD=${BUILD:-1}
 
-# Automatically determine the architecture we're building on:
-if [ -z "$ARCH" ]; then
-  case "$( uname -m )" in
-    i?86) export ARCH=i486 ;;
-    arm*) export ARCH=arm ;;
-    # Unless $ARCH is already set, use uname -m for all other archs:
-       *) export ARCH=$( uname -m ) ;;
-  esac
-fi
-
 NUMJOBS=${NUMJOBS:-" -j7 "}
 
 CWD=$(pwd)
 TMP=${TMP:-/tmp}
 PKG=$TMP/package-pkg-config
+
+set -e
+
 rm -rf $PKG
 mkdir -p $TMP $PKG/${PREFIX}
 
 cd $TMP
 rm -rf pkg-config-$VERSION
-tar xvf $CWD/pkg-config-$VERSION.tar.?z* || exit 1
-cd pkg-config-$VERSION || exit 1
+tar xvf $CWD/pkg-config-$VERSION.tar.?z*
+cd pkg-config-$VERSION
 chown -R root:root .
 chmod -R u+w,go+r-w,a-s .
 
-CFLAGS="$SLKCFLAGS" \
-LDFLAGS="-L/${PREFIX}/lib${LIBDIRSUFFIX}" \
+CFLAGS="-O2" \
 ./configure \
   --prefix=/${PREFIX} \
   --libdir=/${PREFIX}/lib${LIBDIRSUFFIX} \
   --mandir=/${PREFIX}/man \
   --docdir=/${PREFIX}/doc/pkg-config-$VERSION \
+  ${WITH_INSTALLED_GLIB} \
   --host=${HOST_TRIPLET} \
-  --build=${ARCH}-slackware-linux
+  --build=${BUILD_TRIPLET}
 
-make $NUMJOBS || make || exit 1
-make install DESTDIR=$PKG || exit 1
+make $NUMJOBS || make
+make install DESTDIR=$PKG
 
 find $PKG | xargs file | egrep "executable|shared object" \
   | grep ${HOST_EXE_FORMAT} | cut -f 1 -d : \
