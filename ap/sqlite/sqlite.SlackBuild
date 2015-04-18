@@ -34,22 +34,14 @@ BUILD=${BUILD:-1}
 
 NUMJOBS=${NUMJOBS:-" -j7 "}
 
-# Automatically determine the architecture we're building on:
-if [ -z "$ARCH" ]; then
-  case "$( uname -m )" in
-    i?86) export ARCH=i486 ;;
-    arm*) export ARCH=arm ;;
-    # Unless $ARCH is already set, use uname -m for all other archs:
-       *) export ARCH=$( uname -m ) ;;
-  esac
-fi
-
 CWD=$(pwd)
 TMP=${TMP:-/tmp}
 PKG=$TMP/package-$PKGNAM
 
 # Enable some features:
 SLKCFLAGS="-O2 -DSQLITE_ENABLE_FTS3 -DSQLITE_ENABLE_FTS3_PARENTHESIS=1 -DSQLITE_ENABLE_COLUMN_METADATA=1 -DSQLITE_DISABLE_DIRSYNC=1 -DSQLITE_ENABLE_RTREE=1 -DSQLITE_ENABLE_STAT2=1 -DSQLITE_ENABLE_UNLOCK_NOTIFY=1 -DSQLITE_SECURE_DELETE=1"
+
+set -e
 
 rm -rf $PKG
 mkdir -p $TMP $PKG
@@ -82,7 +74,7 @@ autoreconf || exit 1
 
 CFLAGS="$SLKCFLAGS" \
 CXXFLAGS="$SLKCFLAGS" \
-LDFLAGS="-L/${PREFIX}/lib${LIBDIRSUFFIX}" \
+archive_cmds_need_lc="no" \
 ./configure \
   --prefix=/${PREFIX} \
   --libdir=/${PREFIX}/lib${LIBDIRSUFFIX} \
@@ -94,7 +86,7 @@ LDFLAGS="-L/${PREFIX}/lib${LIBDIRSUFFIX}" \
   --disable-threadsafe \
   --enable-tempstore=yes \
   --host=${HOST_TRIPLET} \
-  --build=$ARCH-slackware-linux \
+  --build=${BUILD_TRIPLET} \
   || exit 1
   # These two require pthreads afaiu
   # --enable-threadsafe \
@@ -102,21 +94,8 @@ LDFLAGS="-L/${PREFIX}/lib${LIBDIRSUFFIX}" \
 
   # --enable-load-extension : this requires -ldl; no idea on windows
 
-make $NUMJOBS
-
-if ! [ -e .libs/lib${PKGNAM}3.dll -a -e .libs/lib${PKGNAM}3.dll.a ]; then
-  mkdir .libs
-  mv sqlite3.o .libs/
-  ${HOST_TRIPLET}-gcc -shared -o .libs/lib${PKGNAM}3.dll -Wl,--out-implib=.libs/lib${PKGNAM}3.dll.a -Wl,--export-all-symbols .libs/${PKGNAM}3.o
-fi
-
-make install DESTDIR=$PKG || exit 1
-
-if ! [ -e $PKG/${PREFIX}/bin/libsqlite3.dll \
-  -a -e $PKG/${PREFIX}/lib${LIBDIRSUFFIX}/libsqlite3.dll.a ]; then
-  cp .libs/libsqlite3.dll $PKG/${PREFIX}/bin/
-  cp .libs/libsqlite3.dll.a $PKG/${PREFIX}/lib${LIBDIRSUFFIX}/
-fi
+make $NUMJOBS LTLINK_EXTRAS="-no-undefined"
+make install DESTDIR=$PKG
 
 find $PKG | xargs file | egrep "executable|shared object" \
   | grep ${HOST_EXE_FORMAT} | cut -f 1 -d : \
