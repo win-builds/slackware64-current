@@ -26,35 +26,13 @@ PKGNAM=babl
 VERSION=${VERSION:-$(echo $PKGNAM-*.tar.?z* | rev | cut -f 3- -d . | cut -f 1 -d - | rev)}
 BUILD=${BUILD:-1}
 
-# Automatically determine the architecture we're building on:
-if [ -z "$ARCH" ]; then
-  case "$( uname -m )" in
-    i?86) export ARCH=i486 ;;
-    arm*) export ARCH=arm ;;
-    # Unless $ARCH is already set, use uname -m for all other archs:
-       *) export ARCH=$( uname -m ) ;;
-  esac
-fi
-
 NUMJOBS=${NUMJOBS:-" -j7 "}
 
 CWD=$(pwd)
 TMP=${TMP:-/tmp}
 PKG=$TMP/package-babl
 
-if [ "$ARCH" = "i486" ]; then
-  SLKCFLAGS="-O2 -march=i486 -mtune=i686"
-  LIBDIRSUFFIX=""
-elif [ "$ARCH" = "s390" ]; then
-  SLKCFLAGS="-O2"
-  LIBDIRSUFFIX=""
-elif [ "$ARCH" = "x86_64" ]; then
-  SLKCFLAGS="-O2 -fPIC"
-  LIBDIRSUFFIX="64"
-else
-  SLKCFLAGS="-O2"
-  LIBDIRSUFFIX=""
-fi
+set -e
 
 rm -rf $PKG
 mkdir -p $TMP $PKG
@@ -70,12 +48,13 @@ find . \
  \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
  -exec chmod 644 {} \;
 
-CFLAGS="$SLKCFLAGS" \
+CFLAGS="-O2" \
 ./configure \
-  --prefix=/usr \
-  --libdir=/usr/lib${LIBDIRSUFFIX} \
-  --docdir=/usr/doc/babl-$VERSION \
-  --build=$ARCH-slackware-linux
+  --prefix=/${PREFIX} \
+  --libdir=/${PREFIX}/lib${LIBDIRSUFFIX} \
+  --docdir=/${PREFIX}/doc/babl-$VERSION \
+  --build=${BUILD_TRIPLET} \
+  --host=${HOST_TRIPLET}
   # Trust defaults:
   #--enable-mmx \
   #--disable-sse \
@@ -84,26 +63,29 @@ CFLAGS="$SLKCFLAGS" \
 make $NUMJOBS || make || exit 1
 make install DESTDIR=$PKG
 
-find $PKG | xargs file | grep -e "executable" -e "shared object" | grep ELF \
-  | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+find $PKG | xargs file | egrep -e "executable|shared object" \
+  | grep ${HOST_EXE_FORMAT} | cut -f 1 -d : \
+  | xargs ${HOST_STRIP} --strip-unneeded 2> /dev/null
 
-mkdir -p $PKG/usr/doc/babl-$VERSION
+mkdir -p $PKG/${PREFIX}/doc/babl-$VERSION
 cp -a \
   AUTHORS COPYING* INSTALL NEWS README* TODO \
-  $PKG/usr/doc/babl-$VERSION
+  $PKG/${PREFIX}/doc/babl-$VERSION
 
 # If there's a ChangeLog, installing at least part of the recent history
 # is useful, but don't let it get totally out of control:
 if [ -r ChangeLog ]; then
-  DOCSDIR=$(echo $PKG/usr/doc/*-$VERSION)
+  DOCSDIR=$(echo $PKG/${PREFIX}/doc/*-$VERSION)
   cat ChangeLog | head -n 1000 > $DOCSDIR/ChangeLog
   touch -r ChangeLog $DOCSDIR/ChangeLog
 fi
 
-mkdir -p $PKG/install
-cat $CWD/slack-desc > $PKG/install/slack-desc
-
-# Build the package:
-cd $PKG
-/sbin/makepkg -l y -c n $TMP/babl-$VERSION-$ARCH-$BUILD.txz
+cat ${CWD}/${PKGNAM}.yypkg.script | sed \
+  -e "s/%{PKG}/${PKGNAM}/" \
+  -e "s/%{HST}/${HOST_TRIPLET}/" \
+  -e "s/%{TGT}//" \
+  -e "s/%{VER}/${VERSION}/" \
+  -e "s/%{BUILD}/${BUILD}/" \
+  -e "s/%{DESCR}/${DESCR:-"No description"}/" \
+  | yypkg --makepkg --output ${YYOUTPUT} --script - --directory "${PKG}/${PREFIX}"
 

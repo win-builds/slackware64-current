@@ -24,21 +24,14 @@
 VERSION=${VERSION:-$(echo gucharmap-*.tar.?z* | rev | cut -f 3- -d . | cut -f 1 -d - | rev)}
 BUILD=${BUILD:-2}
 
-# Automatically determine the architecture we're building on:
-if [ -z "$ARCH" ]; then
-  case "$( uname -m )" in
-    i?86) export ARCH=i486 ;;
-    arm*) export ARCH=arm ;;
-    # Unless $ARCH is already set, use uname -m for all other archs:
-       *) export ARCH=$( uname -m ) ;;
-  esac
-fi
-
 NUMJOBS=${NUMJOBS:-" -j7 "}
 
 CWD=$(pwd)
 TMP=${TMP:-/tmp}
 PKG=$TMP/package-gucharmap
+
+set -e
+
 rm -rf $PKG
 mkdir -p $TMP $PKG
 
@@ -54,19 +47,25 @@ find . \
   -exec chmod 644 {} \;
 
 CFLAGS="-O2" \
-LDFLAGS="-L/${PREFIX}/lib${LIBDIRSUFFIX}" \
 ./configure \
   --prefix=/${PREFIX} \
   --libdir=/${PREFIX}/lib${LIBDIRSUFFIX} \
   --sysconfdir=/${PREFIX}/etc \
-  --localstatedir=/var/lib \
+  --localstatedir=/${PREFIX}/var/lib \
   --docdir=/${PREFIX}/doc/gucharmap-$VERSION \
   --enable-static=no \
+  --disable-introspection \
   --host=${HOST_TRIPLET} \
-  --build=$ARCH-slackware-linux
+  --build=${BUILD_TRIPLET}
 
-make -i $NUMJOBS || make || exit 1
-make -i install DESTDIR=$PKG || exit 1
+# !PATCH
+# This runs a linux' native windres instead of using the cross-compiling one.
+sed -i \
+  '/AM_V_GEN) windres -i $< -o $@/ s/windres/'"${HOST_TRIPLET}-windres"'/' \
+  gucharmap/Makefile
+
+make $NUMJOBS || make || exit 1
+make install DESTDIR=$PKG || exit 1
 
 # We don't want the gconf stuff
 rm -rf $PKG/${PREFIX}/etc
@@ -92,7 +91,7 @@ cat ${CWD}/gucharmap.yypkg.script | sed \
   -e "s/%{PKG}/gucharmap/" \
   -e "s/%{HST}/${HOST_TRIPLET}/" \
   -e "s/%{TGT}//" \
-  -e "s/%{VER}/$(echo ${VERSION} | tr . ' ')/" \
+  -e "s/%{VER}/${VERSION}/" \
   -e "s/%{BUILD}/${BUILD}/" \
   -e "s/%{DESCR}/${DESCR:-"No description"}/" \
   | yypkg --makepkg --output ${YYOUTPUT} --script - --directory "${PKG}/${PREFIX}"

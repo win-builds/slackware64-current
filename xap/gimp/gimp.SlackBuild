@@ -25,37 +25,16 @@ PKGNAM=gimp
 VERSION=${VERSION:-$(echo $PKGNAM-*.tar.?z* | rev | cut -f 3- -d . | cut -f 1 -d - | rev)}
 BUILD=${BUILD:-1}
 
-# Automatically determine the architecture we're building on:
-if [ -z "$ARCH" ]; then
-  case "$( uname -m )" in
-    i?86) export ARCH=i486 ;;
-    arm*) export ARCH=arm ;;
-    # Unless $ARCH is already set, use uname -m for all other archs:
-       *) export ARCH=$( uname -m ) ;;
-  esac
-fi
-
 NUMJOBS=${NUMJOBS:-" -j7 "}
 
 CWD=$(pwd)
 TMP=${TMP:-/tmp}
 PKG=$TMP/package-gimp
+
+set -e
+
 rm -rf $PKG
 mkdir -p $TMP $PKG
-
-if [ "$ARCH" = "i486" ]; then
-  SLKCFLAGS="-O2 -march=i486 -mtune=i686"
-  LIBDIRSUFFIX=""
-elif [ "$ARCH" = "s390" ]; then
-  SLKCFLAGS="-O2"
-  LIBDIRSUFFIX=""
-elif [ "$ARCH" = "x86_64" ]; then
-  SLKCFLAGS="-O2 -fPIC"
-  LIBDIRSUFFIX="64"
-else
-  SLKCFLAGS="-O2"
-  LIBDIRSUFFIX=""
-fi
 
 cd $TMP
 rm -rf gimp-$VERSION
@@ -71,27 +50,30 @@ find . \
 
 CFLAGS="$SLKCFLAGS" \
 ./configure \
-  --prefix=/usr \
-  --libdir=/usr/lib${LIBDIRSUFFIX} \
-  --sysconfdir=/etc \
-  --localstatedir=/var/lib \
-  --mandir=/usr/man \
-  --infodir=/usr/info \
-  --docdir=/usr/doc/gimp-$VERSION \
+  --prefix=/${PREFIX} \
+  --libdir=/${PREFIX}/lib${LIBDIRSUFFIX} \
+  --sysconfdir=/${PREFIX}/etc \
+  --localstatedir=/${PREFIX}/var/lib \
+  --mandir=/${PREFIX}/man \
+  --infodir=/${PREFIX}/info \
+  --docdir=/${PREFIX}/doc/gimp-$VERSION \
   --disable-static \
   --with-libcurl \
-  --build=$ARCH-slackware-linux
+  --disable-python \
+  --without-wmf \
+  --build=${BUILD_TRIPLET} \
+  --host=${HOST_TRIPLET}
 
 make $NUMJOBS || make || exit 1
-mkdir -p $PKG/usr/share/applications $PKG/usr/share/application-registry
+mkdir -p $PKG/${PREFIX}/share/applications $PKG/${PREFIX}/share/application-registry
 make install DESTDIR=$PKG || exit 1
 
 # Add a manpage symlink for POLA-compliance
-( cd $PKG/usr/man/man1 ; ln -sf gimptool-2.?.1 gimptool.1 )
+( cd $PKG/${PREFIX}/man/man1 ; ln -sf gimptool-2.?.1 gimptool.1 )
 
 # Compress and link manpages, if any:
-if [ -d $PKG/usr/man ]; then
-  ( cd $PKG/usr/man
+if [ -d $PKG/${PREFIX}/man ]; then
+  ( cd $PKG/${PREFIX}/man
     for manpagedir in $(find . -type d -name "man*") ; do
       ( cd $manpagedir
         for eachpage in $( find . -type l -maxdepth 1) ; do
@@ -104,32 +86,35 @@ if [ -d $PKG/usr/man ]; then
   )
 fi
 
-mkdir -p $PKG/usr/doc/gimp-$VERSION
+mkdir -p $PKG/${PREFIX}/doc/gimp-$VERSION
 cp -a \
   AUTHORS COPYING* HACKING INSTALL LICENSE NEWS README* docs/Wilber* \
-  $PKG/usr/doc/gimp-$VERSION
-( cd $PKG/usr/doc/gimp-$VERSION
+  $PKG/${PREFIX}/doc/gimp-$VERSION
+( cd $PKG/${PREFIX}/doc/gimp-$VERSION
   for i in \
     libgimp libgimpbase libgimpcolor libgimpconfig libgimpmath \
     libgimpmodule libgimpthumb libgimpwidgets ; do \
-   ln -s /usr/share/gtk-doc/html/$i $i-html ; 
+   ln -s /${PREFIX}/share/gtk-doc/html/$i $i-html ; 
   done
 )
 
 # If there's a ChangeLog, installing at least part of the recent history
 # is useful, but don't let it get totally out of control:
 if [ -r ChangeLog ]; then
-  DOCSDIR=$(echo $PKG/usr/doc/*-$VERSION)
+  DOCSDIR=$(echo $PKG/${PREFIX}/doc/*-$VERSION)
   cat ChangeLog | head -n 1000 > $DOCSDIR/ChangeLog
   touch -r ChangeLog $DOCSDIR/ChangeLog
 fi
 
-find $PKG | xargs file | grep -e "executable" -e "shared object" | grep ELF \
-  | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+find $PKG | xargs file | egrep -e "executable|shared object" \
+  | grep ${HOST_EXE_FORMAT} | cut -f 1 -d : \
+  | xargs ${HOST_STRIP} --strip-unneeded 2> /dev/null
 
-mkdir -p $PKG/install
-cat $CWD/slack-desc > $PKG/install/slack-desc
-
-cd $PKG
-/sbin/makepkg -l y -c n $TMP/gimp-$VERSION-$ARCH-$BUILD.txz
-
+cat ${CWD}/${PKGNAM}.yypkg.script | sed \
+  -e "s/%{PKG}/${PKGNAM}/" \
+  -e "s/%{HST}/${HOST_TRIPLET}/" \
+  -e "s/%{TGT}//" \
+  -e "s/%{VER}/${VERSION}/" \
+  -e "s/%{BUILD}/${BUILD}/" \
+  -e "s/%{DESCR}/${DESCR:-"No description"}/" \
+  | yypkg --makepkg --output ${YYOUTPUT} --script - --directory "${PKG}/${PREFIX}"
