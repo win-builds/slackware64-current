@@ -56,7 +56,7 @@ CFLAGS="-O2" \
   --build=${BUILD_TRIPLET}
 
 make $NUMJOBS || make || exit 1
-make install DESTDIR=$PKG
+make -j 1 install DESTDIR=$PKG
 
 find $PKG | xargs file | egrep -e "executable|shared object" \
   | grep ${HOST_EXE_FORMAT} | cut -f 1 -d : \
@@ -79,7 +79,7 @@ fi
 
 mkdir -p $PKG/${PREFIX}/doc/atk-$VERSION
 cp -a \
-  AUTHORS COPYING* NEWS README* TODO \
+  AUTHORS COPYING* NEWS README* \
   $PKG/${PREFIX}/doc/atk-$VERSION
 
 # If there's a ChangeLog, installing at least part of the recent history
