@@ -86,7 +86,7 @@ LDFLAGS="-L/${PREFIX}/lib${LIBDIRSUFFIX}" \
   --build=$ARCH-slackware-linux
 
 make $NUMJOBS || make || exit 1
-make install DESTDIR=$PKG || exit 1
+make -j1 install DESTDIR=$PKG || exit 1
 
 # Upstream has changed the default templatedir to /usr/share/fontconfig/conf.avail.
 # This change, if accepted, would break any existing font package containing a
