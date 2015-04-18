@@ -25,25 +25,11 @@ VERSION=${VERSION:-$(echo $PKGNAM-*.tar.?z* | rev | cut -f 3- -d . | cut -f 1 -d
 SOLIB=1.0.6
 BUILD=${BUILD:-1}
 
-# Automatically determine the architecture we're building on:
-if [ -z "$ARCH" ]; then
-  case "$( uname -m )" in
-    i?86) export ARCH=i486 ;;
-    arm*) export ARCH=arm ;;
-    # Unless $ARCH is already set, use uname -m for all other archs:
-       *) export ARCH=$( uname -m ) ;;
-  esac
-fi
-
 CWD=$(pwd)
 TMP=${TMP:-/tmp}
 PKG=$TMP/package-bzip2
 
-if [ "$ARCH" = "x86_64" ]; then
-  LIBDIRSUFFIX="64"
-else
-  LIBDIRSUFFIX=""
-fi
+set -e
 
 rm -rf $PKG
 mkdir -p $TMP $PKG
@@ -53,66 +39,62 @@ rm -rf bzip2-$VERSION
 tar xzvf $CWD/bzip2-$VERSION.tar.gz || exit 1
 cd bzip2-$VERSION || exit 1
 chown -R root:root .
+
 # This should be ok, since libbz2.so.1.0 will still exist.
 zcat $CWD/bzip2.saneso.diff.gz | patch -p1 || exit
-make -f Makefile-libbz2_so || exit 1
-make -j3 || make || exit 1
-mkdir -p $PKG/usr/include
-cp -a bzlib.h $PKG/usr/include
-chown root:root $PKG/usr/include/bzlib.h
-chmod 644 $PKG/usr/include/bzlib.h
-mkdir -p $PKG/usr/lib${LIBDIRSUFFIX}
-cp -a libbz2.a $PKG/usr/lib${LIBDIRSUFFIX}/libbz2.a
-mkdir -p $PKG/lib${LIBDIRSUFFIX}
-cp -a libbz2.so.$SOLIB $PKG/lib${LIBDIRSUFFIX}/libbz2.so.$SOLIB
-chmod 644 $PKG/usr/lib${LIBDIRSUFFIX}/libbz2.a
-chmod 755 $PKG/lib${LIBDIRSUFFIX}/libbz2.so.$SOLIB
-mkdir -p $PKG/bin
-cat bzip2-shared > $PKG/bin/bzip2
-cat bzip2recover > $PKG/bin/bzip2recover
-mkdir -p $PKG/usr/man/man1
-cat bzip2.1 | gzip -9c > $PKG/usr/man/man1/bzip2.1.gz
-echo '.so man1/bzip2.1' | gzip -9c > $PKG/usr/man/man1/bzip2recover.1.gz
-mkdir -p $PKG/usr/doc/bzip2-$VERSION
-cp -a CHANGES LICENSE README* \
-  bzip2.txt *.html $PKG/usr/doc/bzip2-$VERSION
-chmod 644 $PKG/usr/doc/bzip2-$VERSION/*
+
+# !PATCH
+sed -i \
+  -e 's/\.so/\.dll/g' \
+  -e 's/-fpic -fPIC //g' \
+  Makefile-libbz2_so
+
+sed -i '/<sys\\stat\.h>/ s;\\;/;' bzip2.c
+
+make -f $CWD/Makefile-fix libbz2-1.dll libbz2.dll.a \
+  CC="${HOST_TRIPLET}-gcc"
+
+mkdir -p $PKG/${PREFIX}/{bin,include,lib${LIBDIRSUFFIX},man/man1,doc/bzip2-${VERSION}}
+
+cp -a bzlib.h $PKG/${PREFIX}/include
+cp -a bzip2.exe bzip2recover.exe libbz2-1*.dll $PKG/${PREFIX}/bin
+cp -a libbz2.dll.a $PKG/${PREFIX}/lib${LIBDIRSUFFIX}
+
+cat bzip2.1 | gzip -9c > $PKG/${PREFIX}/man/man1/bzip2.1.gz
+echo '.so man1/bzip2.1' | gzip -9c > $PKG/${PREFIX}/man/man1/bzip2recover.1.gz
+cp -a CHANGES LICENSE README* bzip2.txt *.html \
+  $PKG/${PREFIX}/doc/bzip2-$VERSION
+
 # Link up them links
-( cd $PKG
-  ( cd lib${LIBDIRSUFFIX}
-    rm -f libbz2.so.1.0 libbz2.so.1
-    ln -sf libbz2.so.$SOLIB libbz2.so.1.0
-    ln -sf libbz2.so.1.0 libbz2.so.1
-  )
-  ( cd usr/lib${LIBDIRSUFFIX}
-    ln -sf ../../lib${LIBDIRSUFFIX}/libbz2.so.1 libbz2.so
-  )
-  ( cd bin ; ln -sf bzip2 bunzip2 )
-  ( cd bin ; ln -sf bzip2 bzcat )
-  mkdir -p usr/bin
-  ( cd usr/bin
-    ln -sf ../../bin/bzip2 .
-    ln -sf ../../bin/bzip2 bunzip2
-    ln -sf ../../bin/bzip2 bzcat
-    ln -sf bzmore bzless
-  )
+( cd $PKG/${PREFIX}/bin
+  ln -sf bzip2.exe bunzip2
+  ln -sf bzip2.exe bzcat
+  ln -sf bzmore bzless
 )
+
 # Here are some optional scripts:
 for file in bzdiff bzgrep bzmore ; do
-  cat $file > $PKG/usr/bin/$file
-  cat ${file}.1 | gzip -9c > $PKG/usr/man/man1/${file}.1.gz
+  cat $file > $PKG/${PREFIX}/bin/$file
+  cat ${file}.1 | gzip -9c > $PKG/${PREFIX}/man/man1/${file}.1.gz
 done
-( cd $PKG
-  find . | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
-  find . | xargs file | grep "shared object" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
-)
-chmod 755 $PKG/bin/* $PKG/usr/bin/*
-mkdir -p $PKG/install
-cat $CWD/slack-desc > $PKG/install/slack-desc
 
-# Build the package:
-cd $PKG
-makepkg -l y -c n $TMP/bzip2-$VERSION-$ARCH-$BUILD.txz
+find $PKG | xargs file | egrep -e "executable|shared object" \
+  | grep ${HOST_EXE_FORMAT} | cut -f 1 -d : \
+  | xargs ${HOST_STRIP} --strip-unneeded 2> /dev/null || true
+
+chown -R root:root $PKG
+find $PKG -type f -exec chmod 644 {} +
+find $PKG -type d -exec chmod 755 {} +
+chmod +x $PKG/${PREFIX}/bin/*
+
+cat ${CWD}/${PKGNAM}.yypkg.script | sed \
+  -e "s/%{PKG}/${PKGNAM}/" \
+  -e "s/%{HST}/${HOST_TRIPLET}/" \
+  -e "s/%{TGT}//" \
+  -e "s/%{VER}/${VERSION}/" \
+  -e "s/%{BUILD}/${BUILD}/" \
+  -e "s/%{DESCR}/${DESCR:-"No description"}/" \
+  | yypkg --makepkg --output ${YYOUTPUT} --script - --directory "${PKG}/${PREFIX}"
 
 # Clean up the extra stuff:
 if [ "$1" = "--cleanup" ]; then

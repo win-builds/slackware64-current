@@ -1,0 +1,7 @@
+include Makefile-libbz2_so
+
+libbz2-1.dll libbz2.dll.a: libbz2.def $(OBJS)
+	$(CC) -shared -Wl,--out-implib,libbz2.dll.a $(LDFLAGS) \
+		-o libbz2-1.dll $(OBJS)
+	$(CC) $(CFLAGS) -o bzip2.exe bzip2.c -lbz2 -L.
+	$(CC) $(CFLAGS) -o bzip2recover.exe bzip2recover.c -lbz2 -L.
