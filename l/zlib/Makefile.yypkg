@@ -64,15 +64,7 @@ OBJS = adler32.o compress.o crc32.o deflate.o gzclose.o gzlib.o gzread.o \
        zutil.o
 OBJA =
 
-all: $(STATICLIB) $(SHAREDLIB) $(IMPLIB) example.exe minigzip.exe example_d.exe minigzip_d.exe
-
-test: example.exe minigzip.exe
-	./example
-	echo hello world | ./minigzip | ./minigzip -d
-
-testdll: example_d.exe minigzip_d.exe
-	./example_d
-	echo hello world | ./minigzip_d | ./minigzip_d -d
+all: $(STATICLIB) $(SHAREDLIB) $(IMPLIB) example.exe minigzip.exe
 
 .c.o:
 	$(CC) $(CFLAGS) $(EXTRA_CFLAGS) -c -o $@ $<
@@ -83,20 +75,10 @@ testdll: example_d.exe minigzip_d.exe
 $(STATICLIB): $(OBJS) $(OBJA)
 	$(AR) $(ARFLAGS) $@ $(OBJS) $(OBJA)
 
-$(IMPLIB): $(SHAREDLIB)
-
-$(SHAREDLIB): win32/zlib.def $(OBJS) $(OBJA) zlibrc.o
+$(SHAREDLIB) $(IMPLIB): win32/zlib.def $(OBJS) $(OBJA) zlibrc.o
 	$(CC) -shared -Wl,--out-implib,$(IMPLIB) $(LDFLAGS) \
 	-o $@ win32/zlib.def $(OBJS) $(OBJA) zlibrc.o
-	$(STRIP) $@
-
-example.exe: example.o $(STATICLIB)
-	$(LD) $(LDFLAGS) -o $@ example.o $(STATICLIB)
-	$(STRIP) $@
-
-minigzip.exe: minigzip.o $(STATICLIB)
-	$(LD) $(LDFLAGS) -o $@ minigzip.o $(STATICLIB)
-	$(STRIP) $@
+	$(STRIP) $(SHAREDLIB)
 
 example_d.exe: example.o $(IMPLIB)
 	$(LD) $(LDFLAGS) -o $@ example.o $(IMPLIB)
