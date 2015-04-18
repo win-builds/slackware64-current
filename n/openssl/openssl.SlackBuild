@@ -142,8 +142,6 @@ export CROSS_COMPILE="${HOST_TRIPLET}-"
 
 (make $NUMJOBS; make) || exit 1
 
-set +x
-
 make install INSTALL_PREFIX=$PKG1 || exit 1
 cp lib{crypto,ssl}-1.0.0.dll $PKG1/${PREFIX}/bin
 
