@@ -87,6 +87,13 @@ make install DESTDIR=$PKG || exit 1
 find $PKG | xargs file | grep -e "executable" -e "shared object" | grep ELF \
   | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
 
+# Put bash-completion file in system directory:
+mkdir -p $PKG/usr/share/bash-completion/completions/
+mv $PKG/etc/bash_completion.d/dbus-bash-completion.sh \
+   $PKG/usr/share/bash-completion/completions/dbus
+chmod 0644 $PKG/usr/share/bash-completion/completions/dbus
+rmdir --parents $PKG/etc/bash_completion.d 2>/dev/null
+
 # Compress and link manpages, if any:
 if [ -d $PKG/usr/man ]; then
   ( cd $PKG/usr/man

@@ -63,10 +63,19 @@ rm -rf tiff-$VERSION
 tar xvf $CWD/tiff-$VERSION.tar.?z* || exit 1
 cd tiff-$VERSION
 
-zcat $CWD/tiff-3.9.7_CVE-2012-4447_CVE-2012-4564_CVE-2013-1960_CVE-2013-1961.diff.gz | patch -p1 --verbose || exit 1
-zcat $CWD/tiff-3.9.7_CVE-2013-4231.diff.gz | patch -p1 --verbose || exit 1
-zcat $CWD/tiff-3.9.7_CVE-2013-4232.diff.gz | patch -p1 --verbose || exit 1
-zcat $CWD/tiff-3.9.7_CVE-2013-4244.diff.gz | patch -p1 --verbose || exit 1
+zcat $CWD/libtiff-am-version.patch.gz | patch -p1 --verbose || exit 1
+zcat $CWD/libtiff-CVE-2012-4447.patch.gz | patch -p1 --verbose || exit 1
+zcat $CWD/libtiff-CVE-2012-4564.patch.gz | patch -p1 --verbose || exit 1
+zcat $CWD/libtiff-printdir-width.patch.gz | patch -p1 --verbose || exit 1
+zcat $CWD/libtiff-jpeg-test.patch.gz | patch -p1 --verbose || exit 1
+zcat $CWD/libtiff-CVE-2013-1960.patch.gz | patch -p1 --verbose || exit 1
+zcat $CWD/libtiff-CVE-2013-1961.patch.gz | patch -p1 --verbose || exit 1
+zcat $CWD/libtiff-manpage-update.patch.gz | patch -p1 --verbose || exit 1
+zcat $CWD/libtiff-CVE-2013-4231.patch.gz | patch -p1 --verbose || exit 1
+zcat $CWD/libtiff-CVE-2013-4232.patch.gz | patch -p1 --verbose || exit 1
+zcat $CWD/libtiff-CVE-2013-4244.patch.gz | patch -p1 --verbose || exit 1
+zcat $CWD/libtiff-make-check.patch.gz | patch -p1 --verbose || exit 1
+zcat $CWD/libtiff-CVE-2013-4243.patch.gz | patch -p1 --verbose || exit 1
 
 chown -R root:root .
 find . \

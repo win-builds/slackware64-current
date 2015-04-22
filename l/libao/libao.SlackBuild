@@ -51,7 +51,7 @@ rm -rf $PKG
 mkdir -p $TMP $PKG
 cd $TMP
 rm -rf libao-$VERSION
-tar xvf $CWD/libao-$VERSION.tar.gz
+tar xvf $CWD/libao-$VERSION.tar.?z*
 cd libao-$VERSION
 chown -R root:root .
 find . \
@@ -60,7 +60,6 @@ find . \
   \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
   -exec chmod 644 {} \;
 
-#zcat $CWD/libao.use_new_alsa_api.diff.gz | patch -p1 --verbose
 ./configure \
   --prefix=/usr \
   --libdir=/usr/lib${LIBDIRSUFFIX} \

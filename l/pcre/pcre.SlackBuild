@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Copyright 2008, 2009, 2010, 2011, 2013  Patrick J. Volkerding, Sebeka, MN, USA
+# Copyright 2008, 2009, 2010, 2011, 2013, 2014  Patrick J. Volkerding, Sebeka, MN, USA
 # All rights reserved.
 #
 # Redistribution and use of this script, with or without modification, is
@@ -79,7 +79,10 @@ CFLAGS="$SLKCFLAGS" \
   --enable-utf8 \
   --enable-pcre16 \
   --enable-pcre32 \
+  --enable-jit \
   --enable-unicode-properties \
+  --enable-pcregrep-libz \
+  --enable-pcregrep-libbz2 \
   --build=$ARCH-slackware-linux
 
 CFLAGS="$SLKCFLAGS" make $NUMJOBS || make || exit 1

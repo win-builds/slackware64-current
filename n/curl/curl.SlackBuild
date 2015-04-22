@@ -78,6 +78,7 @@ CFLAGS="$SLKCFLAGS" \
   --libdir=/usr/lib${LIBDIRSUFFIX} \
   --mandir=/usr/man \
   --with-ca-bundle=/usr/share/curl/ca-bundle.crt \
+  --enable-static=no \
   $SSLOPT
 
 make $NUMJOBS || make || exit 1

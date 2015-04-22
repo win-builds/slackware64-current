@@ -22,7 +22,7 @@
 
 
 VERSION=${VERSION:-$(echo gtk+-*.tar.?z* | rev | cut -f 3- -d . | cut -f 1 -d - | rev)}
-BUILD=${BUILD:-2}
+BUILD=${BUILD:-1}
 
 NUMJOBS=${NUMJOBS:-" -j7 "}
 
@@ -74,7 +74,7 @@ autoreconf -vif
 
 # Autoconf changes linux to linux-gnu.
 # Our host is $ARCH-slackware-linux not $ARCH-slackware-linux-gnu:
-sed -i -e 's#linux|linux-gnu|#linux|linux|#' config.sub
+sed -i -e 's#linux|linux-gnu|#linux|linux|#' build-aux/config.sub
 
 CFLAGS="$SLKCFLAGS" \
 ./configure \
@@ -83,7 +83,6 @@ CFLAGS="$SLKCFLAGS" \
   --sysconfdir=/etc \
   --mandir=/usr/man \
   --enable-xkb \
-  --enable-packagekit=no \
   --build=$ARCH-slackware-linux
 #  --enable-gtk-doc-html=no \
 

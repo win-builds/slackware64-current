@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Copyright 2007  Heinz Wiesinger <hmwiesinger@gmx.at>
+# Copyright 2007, 2014  Heinz Wiesinger, Amsterdam, NL
 # Copyright 2008, 2009, 2010, 2011, 2012  Patrick J. Volkerding, Sebeka, MN, USA
 # All rights reserved.
 #
@@ -24,9 +24,8 @@
 # Modified by Robby Workman <rworkman at slackware.com>
 # Modified by Eric Hameleers <alien at slackware.com>
 
-
-VERSION=0.9.9
-BUILD=${BUILD:-2}
+VERSION=${VERSION:-$(echo LibVNCServer-*.tar.?z* | rev | cut -f 3- -d . | cut -f 1 -d - | rev)}
+BUILD=${BUILD:-1}
 
 NUMJOBS=${NUMJOBS:--j7}
 
@@ -80,6 +79,8 @@ find . \
  -exec chmod 755 {} \; -o \
  \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
  -exec chmod 644 {} \;
+
+./autogen.sh
 
 CFLAGS="$SLKCFLAGS" \
 CXXFLAGS="$SLKCFLAGS" \

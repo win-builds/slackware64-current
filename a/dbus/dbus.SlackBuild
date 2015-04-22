@@ -69,7 +69,6 @@ find . \
  -exec chmod 644 {} \;
 
 zcat $CWD/dbus-1.6.x-allow_root_globally.diff.gz | patch -p1 --verbose || exit 1
-zcat $CWD/dbus.set.home.diff.gz | patch -p1 --verbose || exit 1
 
 CFLAGS="$SLKCFLAGS" \
 CXXFLAGS="$SLKCFLAGS" \
@@ -88,6 +87,7 @@ CXXFLAGS="$SLKCFLAGS" \
   --enable-x11-autolaunch \
   --with-system-pid-file=/var/run/dbus/dbus.pid \
   --with-system-socket=/var/run/dbus/system_bus_socket \
+  --with-console-auth-dir=/var/run/console \
   --with-init-scripts=slackware \
   --build=$ARCH-slackware-linux
 

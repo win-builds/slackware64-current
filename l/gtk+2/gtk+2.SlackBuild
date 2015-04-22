@@ -77,8 +77,13 @@ zcat $CWD/gtk.xid.nowarningflood.diff.gz | patch -p1 --verbose || exit 1
 
 # Patch to restore commonly used icon names, otherwise everything breaks.
 # I fail to see the point of this "cleanup"
-zcat $CWD/gtk+-2.24.x.icon-compat.diff.gz | patch -p1 --verbose || exit 1
 zcat $CWD/gtk+-2.24.x.icon-compat.am.diff.gz | patch -p1 --verbose || exit 1
+zcat $CWD/gtk+-2.24.x.icon-compat.diff.gz | patch -p1 --verbose || exit 1
+
+# Prevents build failures in the docs.  Found online.
+# Only needed if autoreconf is used...  ?
+zcat $CWD/gtk.gtk-faq.diff.gz | patch -p1 --verbose || exit 1
+zcat $CWD/gtk.gtk-tut.diff.gz | patch -p1 --verbose || exit 1
 
 # Regenerate ./configure:
 libtoolize --force
@@ -117,7 +122,8 @@ make install \
 mv $PKG/etc/gtk-2.0/im-multipress.conf $PKG/etc/gtk-2.0/im-multipress.conf.new || exit 1
 
 # Install a "starter" gtkrc
-echo 'gtk-theme-name="GTK+"' > $PKG/etc/gtk-2.0/gtkrc.new
+# /etc/gtk-2.0/gtkrc overrides this  --rworkman
+echo 'gtk-theme-name="GTK+"' > $PKG/usr/share/gtk-2.0/gtkrc
 
 # We need to have separate 32-bit and 64-bit binaries
 # for places where we have two copies of the GTK+ package installed.

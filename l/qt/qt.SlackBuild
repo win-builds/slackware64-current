@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Copyright 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014  Patrick J. Volkerding, Sebeka, MN, USA
+# Copyright 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015  Patrick J. Volkerding, Sebeka, MN, USA
 # All rights reserved.
 #
 # Redistribution and use of this script, with or without modification, is
@@ -37,11 +37,11 @@
 # wget http://qt.gitorious.org/qt/kde-qt/archive-tarball/4.6.2-patched
 #
 # Modifications 2010, 2011, 2012  Eric Hameleers, Eindhoven, NL
-# qt 4.7.3, 4.7.4, 4.8.0, 4.8.1, 4.8.2, 4.8.4 are built from original nokia sources.
+# qt 4.7.3, 4.7.4, 4.8.0, 4.8.1, 4.8.2, 4.8.4, 4.8.5, 4.8.6 are built from original nokia sources.
 
 PKGNAM=qt
 VERSION=$(ls qt-*.tar.?z* | rev | cut -f 3- -d . | cut -f 1 -d - | rev)
-BUILD=${BUILD:-1}
+BUILD=${BUILD:-2}
 
 NUMJOBS=${NUMJOBS:--j7}
 
@@ -112,6 +112,20 @@ zcat $CWD/qt.webkit-no_Werror.patch.gz | patch -p1 --verbose || exit 1
 
 # Fix crash on malformed GIF images (CVE-2014-0190):
 zcat $CWD/qt.fix.broken.gif.crash.diff.gz | patch -p1 --verbose || exit 1
+
+# Implement qsystemtrayicon support for Qt4 applications in Plasma 5:
+zcat $CWD/qt.qsystemtrayicon-plugin-system.diff.gz | patch -p1 --verbose || exit 1
+
+# Apply LibreOffice fixes (QTBUG-37380, QTBUG-34614, QTBUG-38585),
+# Native KDE4 file pickers will be disabled at runtime otherwise.
+zcat $CWD/qt.glib-honor-ExcludeSocketNotifiers-flag.diff.gz | patch -p1 --verbose || exit 1
+zcat $CWD/qt.qclipboard_fix_recursive.patch.gz | patch -p1 --verbose || exit 1
+zcat $CWD/qt.qclipboard_delay.patch.gz | patch -p1 --verbose || exit 1
+
+# Image handling security patches:
+zcat $CWD/qt.CVE-2015-0295.bmp.div.zero.dos.diff.gz | patch -p1 --verbose || exit 1
+zcat $CWD/qt.CVE-2015-1858,1859.bmp.ico.overflow.diff.gz | patch -p1 --verbose || exit 1
+zcat $CWD/qt.CVE-2015-1860.gif.overflow.diff.gz | patch -p1 --verbose || exit 1
 
 export CFLAGS="$SLKCFLAGS"
 export CXXFLAGS="$SLKCFLAGS"
