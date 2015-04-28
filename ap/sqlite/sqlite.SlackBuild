@@ -24,6 +24,17 @@
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 PKGNAM=sqlite
+
+# First, convert the .zip file if needed:
+if ls *.zip 1> /dev/null 2> /dev/null ; then
+  unzip *.zip
+  tar cf $(basename *.zip .zip).tar $(basename *.zip .zip)
+  touch -r *.zip *.tar
+  xz -9 *.tar
+  rm -r $(basename *.zip .zip)
+  rm *.zip
+fi
+
 VERSION=${VERSION:-$(echo $PKGNAM-src-*.tar.?z* | rev | cut -f 3- -d . | cut -f 1 -d - | rev)}
 OLD_STYLE=$(printf %d $(echo $VERSION | cut -b 1)).$(printf %d $(echo $VERSION | cut -b 2,3)).$(printf %d $(echo $VERSION | cut -b 4,5))
 OLD_STYLE=$(printf "%1.f" $(echo $VERSION | cut -b 1)).$(printf "%1.f" $(echo $VERSION | cut -b 2,3)).$(printf "%1.f" $(echo $VERSION | cut -b 4,5))
