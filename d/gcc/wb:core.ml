@@ -13,7 +13,7 @@
     ~dir
     ~version:"4.8.3"
     ~sources:[
-      Tarball ("gcc-${VERSION}.tar.xz", "f2f894d6652f697fede264c16c028746e9ee6243")
+      Tarball ("${PACKAGE}-${VERSION}.tar.xz", "f2f894d6652f697fede264c16c028746e9ee6243")
     ]
     ~outputs:gcc_outputs
   in
