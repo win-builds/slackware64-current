@@ -9,7 +9,7 @@
     in
     List.map (fun name -> String.concat "-" [ name; rem ]) names
   in
-  let gcc_add = add_full
+  let gcc_add = add
     ~dir
     ~version:"4.8.3"
     ~sources:[
