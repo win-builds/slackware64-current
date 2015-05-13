@@ -1,10 +1,10 @@
     let libpng = add (name, variant)
       ~dir
       ~dependencies:[ zlib ]
-      ~version:"1.4.14"
+      ~version:"1.6.16"
       ~build:1
       ~sources:[
-        Tarball ("${PACKAGE}-${VERSION}.tar.xz", "402271bcd9af622e2f3ff378d57cd73c2dda7ad5");
+        Tarball ("${PACKAGE}-${VERSION}.tar.xz", "31855a8438ae795d249574b0da15b34eb0922e13");
       ]
     in
 

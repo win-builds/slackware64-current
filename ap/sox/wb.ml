@@ -6,10 +6,10 @@
         (* NOTE: available: magic *)
         (* NOTE: available: libpng ! *)
       ]
-      ~version:"14.4.1"
+      ~version:"14.4.2"
       ~build:1
       ~sources:[
-        Tarball ("${PACKAGE}-${VERSION}.tar.xz", "6df5d814edeb1b46354f8493507710ea95fefb2c");
+        Tarball ("${PACKAGE}-${VERSION}.tar.xz", "326565e926ef28800529f9880bcc6e28c9a6e68b");
       ]
     in
 

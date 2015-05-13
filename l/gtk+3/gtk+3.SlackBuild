@@ -22,7 +22,7 @@
 
 
 VERSION=${VERSION:-$(echo gtk+-*.tar.?z* | rev | cut -f 3- -d . | cut -f 1 -d - | rev)}
-BUILD=${BUILD:-2}
+BUILD=${BUILD:-1}
 
 NUMJOBS=${NUMJOBS:-" -j7 "}
 
@@ -51,12 +51,17 @@ patch -p1 --verbose < $CWD/correctly-generate-def-files-again.patch
 libtoolize --copy --force
 autoreconf -vif
 
+#! PATCH
 if [ x"${HOST_TRIPLET}" != x"${BUILD_TRIPLET}" ]; then
   echo 'export PKG_CONFIG_PATH=/usr/local/lib64/pkgconfig:/usr/lib64/pkgconfig:/usr/local/lib64/pkgconfig; export PKG_CONFIG_LIBDIR=; exec pkg-config $@' \
     > 'pkg-config-for-build'
   chmod +x 'pkg-config-for-build'
   export PKG_CONFIG_FOR_BUILD="$(pwd)/pkg-config-for-build"
 fi
+
+# Autoconf changes linux to linux-gnu.
+# Our host is $ARCH-slackware-linux not $ARCH-slackware-linux-gnu:
+sed -i -e 's#linux|linux-gnu|#linux|linux|#' build-aux/config.sub
 
 CFLAGS="-O2" \
 ./configure \

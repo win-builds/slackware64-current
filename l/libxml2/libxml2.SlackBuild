@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Copyright 2008, 2009, 2010, 2011, 2012, 2013  Patrick J. Volkerding, Sebeka, MN, USA
+# Copyright 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015  Patrick J. Volkerding, Sebeka, MN, USA
 # All rights reserved.
 #
 # Redistribution and use of this script, with or without modification, is
@@ -23,7 +23,7 @@
 
 PKGNAM=libxml2
 VERSION=${VERSION:-$(echo $PKGNAM-*.tar.?z* | rev | cut -f 3- -d . | cut -f 1 -d - | rev)}
-BUILD=${BUILD:-1}
+BUILD=${BUILD:-2}
 
 NUMJOBS=${NUMJOBS:-" -j7 "}
 
@@ -51,6 +51,8 @@ find . \
 # merged /usr and /, this will find libraries and will make the build fail.
 sed -i '/LDFLAGS="-L\${Z_DIR}\/lib"/ d' configure.ac
 autoreconf -fiv
+zcat $CWD/libxml2.do-not-check-crc.diff.gz | patch -p1 --verbose || exit 1
+zcat $CWD/libxml2-2.9.2-catalog-revert.patch.gz | patch -p1 --verbose || exit 1
 
 CFLAGS="-O2" \
 LDFLAGS="-L/${PREFIX}/lib${LIBDIRSUFFIX}" \
@@ -59,13 +61,12 @@ LDFLAGS="-L/${PREFIX}/lib${LIBDIRSUFFIX}" \
   --libdir=/${PREFIX}/lib${LIBDIRSUFFIX} \
   --mandir=/${PREFIX}/man \
   --without-python \
+  --disable-static \
   --host=${HOST_TRIPLET} \
   --build=${BUILD_TRIPLET}
 
 make $NUMJOBS || make || exit 1
 make install DESTDIR=$PKG || exit 1
-
-rm -f $PKG/${PREFIX}/lib${LIBDIRSUFFIX}/libxml2.a
 
 find $PKG | xargs file | egrep "executable|shared object" \
   | grep ${HOST_EXE_FORMAT} | cut -f 1 -d : \

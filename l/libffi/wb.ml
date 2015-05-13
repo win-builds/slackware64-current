@@ -1,10 +1,10 @@
     let libffi = add (name, variant)
       ~dir
       ~dependencies:[]
-      ~version:"3.0.13"
+      ~version:"3.2.1"
       ~build:2
       ~sources:[
-        Tarball ("${PACKAGE}-${VERSION}.tar.xz", "03589fae4c732585476f5d93f691bbc446187ef7");
+        Tarball ("${PACKAGE}-${VERSION}.tar.gz", "280c265b789e041c02e5c97815793dfc283fb1e6");
       ]
     in
 

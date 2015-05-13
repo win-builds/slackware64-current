@@ -26,16 +26,6 @@ BUILD=${BUILD:-1}
 
 NUMJOBS=${NUMJOBS:-" -j7 "}
 
-# Automatically determine the architecture we're building on:
-if [ -z "$ARCH" ]; then
-  case "$( uname -m )" in
-    i?86) export ARCH=i486 ;;
-    arm*) export ARCH=arm ;;
-    # Unless $ARCH is already set, use uname -m for all other archs:
-       *) export ARCH=$( uname -m ) ;;
-  esac
-fi
-
 CWD=$(pwd)
 TMP=${TMP:-/tmp}
 PKG=$TMP/package-gtk2
@@ -75,12 +65,24 @@ sed -i \
 # Behaviour change in 2.24.24 and cross-compiling >= 2.24.24 requires a host
 # with >= 2.24.24 otherwise the added switch (which is there to continue using
 # the previous behaviour wrt image data in the icon cache) makes
-# gtk-update-icon-cache fail (ir probably handles it as a regular argument and
+# gtk-update-icon-cache fail (it probably handles it as a regular argument and
 # not a switch since it doesn't complain about it being unknown).
 # Remove the switch if the host's gtk-update-icon-cache doesn't know about it.
 if ! gtk-update-icon-cache --help | grep -q -- --include-image-data; then
   sed -i '/--include-image-data/ d' gtk/Makefile.in
 fi
+
+# if running autoreconf, uncomment below:
+# # Prevents build failures in the docs.  Found online.
+# # Only needed if autoreconf is used...  ?
+# zcat $CWD/gtk.gtk-faq.diff.gz | patch -p1 --verbose || exit 1
+# zcat $CWD/gtk.gtk-tut.diff.gz | patch -p1 --verbose || exit 1
+# # Regenerate ./configure:
+# libtoolize --force
+# autoreconf -vif
+# # Autoconf changes linux to linux-gnu.
+# # Our host is $ARCH-slackware-linux not $ARCH-slackware-linux-gnu:
+# sed -i -e 's#linux|linux-gnu|#linux|linux|#' config.sub
 
 CFLAGS="-O2" \
 LDFLAGS="-L/${PREFIX}/lib${LIBDIRSUFFIX}" \
@@ -104,7 +106,8 @@ make -j1 install \
 mv $PKG/${PREFIX}/etc/gtk-2.0/im-multipress.conf $PKG/${PREFIX}/etc/gtk-2.0/im-multipress.conf.new || exit 1
 
 # Install a "starter" gtkrc
-echo 'gtk-theme-name="GTK+"' > $PKG/${PREFIX}/etc/gtk-2.0/gtkrc
+# /etc/gtk-2.0/gtkrc overrides this  --rworkman
+echo 'gtk-theme-name="GTK+"' > $PKG/usr/share/gtk-2.0/gtkrc
 
 # Strip binaries:
 ( cd $PKG

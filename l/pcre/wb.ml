@@ -1,6 +1,6 @@
     let pcre = add (name, variant)
       ~dir
-      ~dependencies:[]
+      ~dependencies:[ zlib; bzip2 ]
       ~version:"8.36"
       ~build:2
       ~sources:[

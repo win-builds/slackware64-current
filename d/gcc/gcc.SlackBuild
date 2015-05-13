@@ -2,7 +2,7 @@
 # GCC package build script (written by volkerdi@slackware.com)
 #
 # Copyright 2003, 2004  Slackware Linux, Inc., Concord, California, USA
-# Copyright 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014  Patrick J. Volkerding, Sebeka, MN, USA
+# Copyright 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015  Patrick J. Volkerding, Sebeka, MN, USA
 # All rights reserved.
 #
 # Redistribution and use of this script, with or without modification, is
@@ -47,7 +47,7 @@
 PKGNAM="gcc"
 VERSION=${VERSION:-$(echo $PKGNAM-*.tar.xz | rev | cut -f 3- -d . | cut -f 1 -d - | rev)}
 PREFIX=${PREFIX:-usr}
-BUILD=${BUILD:-1}
+BUILD=${BUILD:-2}
 
 # How many jobs to run in parallel:
 NUMJOBS=" -j 7 "
@@ -145,7 +145,7 @@ PKG_GCC=$TMP/package-gcc
 
 ALL_PKGS="${PKG_GCC}"
 ALL_COMPILERS="gcc"
-ALL_LIBS="libmudflap libgomp"
+ALL_LIBS="libgomp"
 
 if echo ${GCC_LANGUAGES} | grep -q 'c++'; then
   PKG_GCC_GPP=$TMP/package-gcc-g++
@@ -375,6 +375,8 @@ fi
      --disable-libunwind-exceptions \
      --enable-__cxa_atexit \
      --enable-libssp \
+     --enable-lto \
+     --enable-install-libiberty \
      --with-gnu-ld \
      --verbose \
      --enable-java-home \

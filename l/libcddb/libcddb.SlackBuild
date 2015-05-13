@@ -23,7 +23,7 @@
 
 PKGNAM=libcddb
 VERSION=${VERSION:-$(echo $PKGNAM-*.tar.?z* | rev | cut -f 3- -d . | cut -f 1 -d - | rev)}
-BUILD=${BUILD:-2}
+BUILD=${BUILD:-3}
 
 # Automatically determine the architecture we're building on:
 if [ -z "$ARCH" ]; then
@@ -56,7 +56,10 @@ find . \
   \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
   -exec chmod 644 {} \;
 
-sed -i '/SEARCH_ALL = ~0,/ s/SEARCH_ALL/LAAAAAPPPPIIIIIINNNNNN/' include/cddb/cddb_conn.h
+for i in include/cddb/cddb_conn.h lib/cddb_cmd.c lib/cddb_conn.c; do
+  sed -i '/SEARCH_ALL = ~0,/ s/SEARCH_ALL/CDDB_SEARCH_ALL/' ${i}
+done
+
 # Configure:
 CFLAGS="-O2" \
 LDFLAGS="-L/${PREFIX}/lib${LIBDIRSUFFIX}" \

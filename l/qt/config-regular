@@ -3,11 +3,14 @@ export CONFIGURE_OPTIONS=" \
   -system-zlib \
   -system-sqlite \
   -system-pcre \
-  -system-harfbuzz \
   -plugin-sql-sqlite \
   -dbus \
   -force-pkg-config \
   -xplatform win32-g++ \
+  -opengl dynamic \
+  -nomake tests \
+  -nomake examples \
+  -skip qtdoc \
   -device-option CROSS_COMPILE="${HOST_TRIPLET}-" \
 "
 

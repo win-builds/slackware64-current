@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Copyright 2008, 2009, 2010  Patrick J. Volkerding, Sebeka, Minnesota, USA
+# Copyright 2008, 2009, 2010, 2015  Patrick J. Volkerding, Sebeka, Minnesota, USA
 # All rights reserved.
 #
 # Redistribution and use of this script, with or without modification, is
@@ -24,16 +24,6 @@ VERSION=${VERSION:-$(echo giflib-*.tar.?z* | rev | cut -f 3- -d . | cut -f 1 -d 
 BUILD=${BUILD:-1}
 
 NUMJOBS=${NUMJOBS:-" -j7 "}
-
-# Automatically determine the architecture we're building on:
-if [ -z "$ARCH" ]; then
-  case "$( uname -m )" in
-    i?86) export ARCH=i486 ;;
-    arm*) export ARCH=arm ;;
-    # Unless $ARCH is already set, use uname -m for all other archs:
-       *) export ARCH=$( uname -m ) ;;
-  esac
-fi
 
 CWD=$(pwd)
 TMP=${TMP:-/tmp}
@@ -59,7 +49,7 @@ LDFLAGS="-L/${PREFIX}/lib${LIBDIRSUFFIX}" \
   --with-x=no \
   --disable-static \
   --host=${HOST_TRIPLET} \
-  --build=$ARCH-slackware-linux
+  --build=${BUILD_TRIPLET}
 
 sed -i 's/libgif_la_LDFLAGS = -version-info 5:6:1/\0 -no-undefined/' lib/Makefile
 
@@ -67,11 +57,15 @@ make $NUMJOBS || make || exit 1
 make install DESTDIR=$PKG || exit 1
 
 mkdir -p $PKG/${PREFIX}/doc/giflib-$VERSION
+
 cp -a \
   AUTHORS BUGS COPYING DEVELOPERS INSTALL NEWS ONEWS README TODO \
   $PKG/${PREFIX}/doc/giflib-$VERSION
 cp -a doc $PKG/${PREFIX}/doc/giflib-$VERSION/html
 rm $PKG/${PREFIX}/doc/giflib-$VERSION/html/Makefile*
+
+find $PKG/usr/man -type f -exec gzip -9 {} \;
+for i in $( find $PKG/usr/man -type l ) ; do ln -s $( readlink $i ).gz $i.gz ; rm $i ; done
 
 # If there's a ChangeLog, installing at least part of the recent history
 # is useful, but don't let it get totally out of control:

@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Copyright 2008, 2009, 2010, 2011, 2013  Patrick J. Volkerding, Sebeka, MN, USA
+# Copyright 2008, 2009, 2010, 2011, 2013, 2014  Patrick J. Volkerding, Sebeka, MN, USA
 # All rights reserved.
 #
 # Redistribution and use of this script, with or without modification, is
@@ -24,16 +24,6 @@
 PKGNAM=pcre
 VERSION=${VERSION:-$(echo $PKGNAM-*.tar.?z* | rev | cut -f 3- -d . | cut -f 1 -d - | rev)}
 BUILD=${BUILD:-1}
-
-# Automatically determine the architecture we're building on:
-if [ -z "$ARCH" ]; then
-  case "$( uname -m )" in
-    i?86) export ARCH=i486 ;;
-    arm*) export ARCH=arm ;;
-    # Unless $ARCH is already set, use uname -m for all other archs:
-       *) export ARCH=$( uname -m ) ;;
-  esac
-fi
 
 NUMJOBS=${NUMJOBS:-" -j7 "}
 
@@ -69,8 +59,11 @@ CFLAGS="-O2" \
   --enable-utf8 \
   --enable-pcre16 \
   --enable-pcre32 \
+  --enable-jit \
   --enable-unicode-properties \
   --disable-static \
+  --enable-pcregrep-libz \
+  --enable-pcregrep-libbz2 \
   --host=${HOST_TRIPLET} \
   --build=${BUILD_TRIPLET}
 

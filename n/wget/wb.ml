@@ -1,10 +1,10 @@
     let wget = add (name, variant)
       ~dir
       ~dependencies:[ openssl; pcre ]
-      ~version:"1.14"
+      ~version:"1.16.3"
       ~build:3
       ~sources:[
-        Tarball ("${PACKAGE}-${VERSION}.tar.xz", "cfa0906e6f72c1c902c29b52d140c22ecdcd617e");
+        Tarball ("${PACKAGE}-${VERSION}.tar.xz", "a7d24a8512720893b0a8c5c436f324e9ed43874d");
       ]
     in
 

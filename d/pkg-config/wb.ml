@@ -10,10 +10,10 @@
       add (name, variant)
         ~dir
         ~dependencies
-        ~version:"0.25"
+        ~version:"0.28"
         ~build:1
         ~sources:[
-          Tarball ("${PACKAGE}-${VERSION}.tar.xz", "d2e75fcdbda33cf1577a76b7b2beaa408f2aa299");
+          Tarball ("${PACKAGE}-${VERSION}.tar.gz", "71853779b12f958777bffcb8ca6d849b4d3bed46");
         ]
     in
 

@@ -1,10 +1,10 @@
     let glib2 = add (name, variant)
       ~dir
       ~dependencies:[ libffi; gettext; pcre ]
-      ~version:"2.42.1"
+      ~version:"2.42.2"
       ~build:1
       ~sources:[
-        Tarball ("glib-${VERSION}.tar.xz", "b5158fd434f01e84259155c04ff93026a090e586");
+        Tarball ("glib-${VERSION}.tar.xz", "87113de4096377fab1129da44f38a0da0f7f0fb4");
       ]
     in
 

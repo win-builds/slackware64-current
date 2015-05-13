@@ -1,10 +1,10 @@
     let libgpg_error = add (name, variant)
       ~dir
       ~dependencies:[]
-      ~version:"1.13"
+      ~version:"1.18"
       ~build:1
       ~sources:[
-        Tarball ("${PACKAGE}-${VERSION}.tar.bz2", "50fbff11446a7b0decbf65a6e6b0eda17b5139fb");
+        Tarball ("${PACKAGE}-${VERSION}.tar.bz2", "7ba54f939da023af8f5b3e7a421a32eb742909c4");
       ]
     in
 

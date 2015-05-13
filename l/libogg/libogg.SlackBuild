@@ -61,7 +61,9 @@ find $PKG | xargs file | egrep -e "executable|shared object" \
   | grep ${HOST_EXE_FORMAT} | cut -f 1 -d : \
   | xargs ${HOST_STRIP} --strip-unneeded 2> /dev/null
 
-cp -a AUTHORS CHANGES COPYING README $PKG/${PREFIX}/doc/libogg-$VERSION
+cp -a \
+  AUTHORS CHANGES COPYING README \
+  $PKG/usr/doc/libogg-$VERSION
 
 cat ${CWD}/libogg.yypkg.script | sed \
   -e "s/%{PKG}/libogg/" \

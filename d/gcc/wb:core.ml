@@ -11,9 +11,9 @@
   in
   let gcc_add = add
     ~dir
-    ~version:"4.8.3"
+    ~version:"4.9.2"
     ~sources:[
-      Tarball ("${PACKAGE}-${VERSION}.tar.xz", "f2f894d6652f697fede264c16c028746e9ee6243")
+      Tarball ("${PACKAGE}-${VERSION}.tar.xz", "e5216a449f26c23456f78a2d76de8bbcd5cdceba")
     ]
     ~outputs:gcc_outputs
   in

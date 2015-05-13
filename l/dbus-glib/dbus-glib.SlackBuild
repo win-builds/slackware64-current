@@ -73,6 +73,13 @@ find $PKG | xargs file | egrep -e "executable|shared object" \
   | grep ${HOST_EXE_FORMAT} | cut -f 1 -d : \
   | xargs ${HOST_STRIP} --strip-unneeded 2> /dev/null
 
+# Put bash-completion file in system directory:
+mkdir -p $PKG/usr/share/bash-completion/completions/
+mv $PKG/etc/bash_completion.d/dbus-bash-completion.sh \
+   $PKG/usr/share/bash-completion/completions/dbus
+chmod 0644 $PKG/usr/share/bash-completion/completions/dbus
+rmdir --parents $PKG/etc/bash_completion.d 2>/dev/null
+
 # Compress and link manpages, if any:
 if [ -d $PKG/${PREFIX}/man ]; then
   ( cd $PKG/${PREFIX}/man

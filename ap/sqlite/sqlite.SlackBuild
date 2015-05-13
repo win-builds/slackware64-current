@@ -3,7 +3,7 @@
 # Slackware build script for sqlite
 
 # Copyright 2006  Martin Lefebvre <dadexter@gmail.com>
-# Copyright 2008, 2009, 2010, 2012  Patrick J. Volkerding, Sebeka, MN, USA
+# Copyright 2008, 2009, 2010, 2012, 2015  Patrick J. Volkerding, Sebeka, MN, USA
 # All rights reserved.
 #
 # Redistribution and use of this script, with or without modification, is
@@ -24,9 +24,21 @@
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 PKGNAM=sqlite
+
+# First, convert the .zip file if needed:
+if ls *.zip 1> /dev/null 2> /dev/null ; then
+  unzip *.zip
+  tar cf $(basename *.zip .zip).tar $(basename *.zip .zip)
+  touch -r *.zip *.tar
+  xz -9 *.tar
+  rm -r $(basename *.zip .zip)
+  rm *.zip
+fi
+
 VERSION=${VERSION:-$(echo $PKGNAM-src-*.tar.?z* | rev | cut -f 3- -d . | cut -f 1 -d - | rev)}
 OLD_STYLE=$(printf %d $(echo $VERSION | cut -b 1)).$(printf %d $(echo $VERSION | cut -b 2,3)).$(printf %d $(echo $VERSION | cut -b 4,5))
-PATCHLEVEL=$(printf %d $(echo $VERSION | cut -b 6,7))
+OLD_STYLE=$(printf "%1.f" $(echo $VERSION | cut -b 1)).$(printf "%1.f" $(echo $VERSION | cut -b 2,3)).$(printf "%1.f" $(echo $VERSION | cut -b 4,5))
+PATCHLEVEL=$(printf "%1.f" $(echo $VERSION | cut -b 6,7))
 if [ ! "$PATCHLEVEL" = "0" ]; then
   OLD_STYLE=${OLD_STYLE}.${PATCHLEVEL}
 fi
@@ -39,7 +51,7 @@ TMP=${TMP:-/tmp}
 PKG=$TMP/package-$PKGNAM
 
 # Enable some features:
-SLKCFLAGS="-O2 -DSQLITE_ENABLE_FTS3 -DSQLITE_ENABLE_FTS3_PARENTHESIS=1 -DSQLITE_ENABLE_COLUMN_METADATA=1 -DSQLITE_DISABLE_DIRSYNC=1 -DSQLITE_ENABLE_RTREE=1 -DSQLITE_ENABLE_STAT2=1 -DSQLITE_ENABLE_UNLOCK_NOTIFY=1 -DSQLITE_SECURE_DELETE=1"
+SLKCFLAGS="-O2 -DSQLITE_ENABLE_FTS3 -DSQLITE_ENABLE_FTS3_PARENTHESIS=1 -DSQLITE_ENABLE_ICU -DSQLITE_ENABLE_COLUMN_METADATA=1 -DSQLITE_DISABLE_DIRSYNC=1 -DSQLITE_ENABLE_RTREE=1 -DSQLITE_ENABLE_STAT2=1 -DSQLITE_ENABLE_UNLOCK_NOTIFY=1 -DSQLITE_SECURE_DELETE=1"
 
 set -e
 
@@ -73,7 +85,8 @@ libtoolize
 autoreconf || exit 1
 
 CFLAGS="$SLKCFLAGS" \
-CXXFLAGS="$SLKCFLAGS" \
+CXXFLAGS="$SLKCFLAGS $(icu-config --cppflags)" \
+LDFLAGS="$(icu-config --ldflags)" \
 archive_cmds_need_lc="no" \
 ./configure \
   --prefix=/${PREFIX} \

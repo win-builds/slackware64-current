@@ -59,6 +59,7 @@ CXXFLAGS="-O2" \
   --prefix=/${PREFIX} \
   --libdir=/${PREFIX}/lib${LIBDIRSUFFIX} \
   --infodir=/${PREFIX}/info \
+  --mandir=/${PREFIX}/man \
   --docdir=/${PREFIX}/doc/libgcrypt-$VERSION \
   --enable-shared=yes \
   --enable-static=no \
@@ -76,6 +77,7 @@ find $PKG | xargs file | egrep "executable|shared object" \
   | grep ${HOST_EXE_FORMAT} | cut -f 1 -d : \
   | xargs ${HOST_STRIP} --strip-unneeded 2> /dev/null
 
+find $PKG/${PREFIX}/man -type f -exec gzip -9 {} \;
 rm -f $PKG/${PREFIX}/info/dir
 gzip -9 $PKG/${PREFIX}/info/*
 

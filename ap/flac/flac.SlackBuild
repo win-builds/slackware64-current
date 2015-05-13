@@ -23,13 +23,15 @@
 
 PKGNAM=flac
 VERSION=${VERSION:-$(echo $PKGNAM-*.tar.?z* | rev | cut -f 3- -d . | cut -f 1 -d - | rev)}
-BUILD=${BUILD:-3}
+BUILD=${BUILD:-1}
 
 NUMJOBS=${NUMJOBS:-" -j7 "}
 
 CWD=$(pwd)
 TMP=${TMP:-/tmp}
 PKG=$TMP/package-flac
+
+set -e
 
 rm -rf $PKG
 mkdir -p $TMP $PKG
@@ -38,6 +40,7 @@ cd $TMP
 rm -rf flac-$VERSION
 tar xvf $CWD/flac-$VERSION.tar.?z* || exit 1
 cd flac-$VERSION
+zcat $CWD/flac.man.diff.gz | patch -p1 --verbose --backup --suffix=.orig || exit 1
 
 chown -R root:root .
 find . \
@@ -55,6 +58,7 @@ LDFLAGS="-L/${PREFIX}/lib${LIBDIRSUFFIX}" \
   --mandir=/${PREFIX}/man \
   --disable-static \
   --disable-xmms-plugin \
+  --disable-silent-rules \
   --host=${HOST_TRIPLET} \
   --build=${BUILD_TRIPLET}
 

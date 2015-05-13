@@ -31,6 +31,8 @@ CWD=$(pwd)
 TMP=${TMP:-/tmp}
 PKG=$TMP/package-${PKGNAM}
 
+set -e
+
 rm -rf $PKG
 mkdir -p $TMP $PKG
 cd $TMP
@@ -49,6 +51,7 @@ find . \
 sed -i \
   -e '/# include <ddk\/ntddcdrm.h>/ s;ddk/;;' \
   -e '/# include <ddk\/ntddscsi.h>/ s;ddk/;;' \
+  -e '/# include <ntddcdrm.h>/ s/#/#include <winternl.h>\n#include <ntdef.h>\n#/' \
   lib/driver/MSWindows/win32_ioctl.c
 
 # Configure:
@@ -61,6 +64,7 @@ LDFLAGS="-L/${PREFIX}/lib${LIBDIRSUFFIX}" \
   --mandir=/${PREFIX}/man \
   --infodir=/${PREFIX}/info \
   --disable-static \
+  --disable-silent-rules \
   --host=${HOST_TRIPLET} \
   --build=${BUILD_TRIPLET}
 

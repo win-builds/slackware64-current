@@ -1,10 +1,10 @@
     let sqlite = add (name, variant)
       ~dir
-      ~dependencies:[]
-      ~version:"3071700"
+      ~dependencies:[ icu4c ]
+      ~version:"3080900"
       ~build:1
       ~sources:[
-        Tarball ("${PACKAGE}-src-3071700.tar.xz", "eb5e12337d29ce2da9a9ed9b1d69f6c66c2e4877");
+        Tarball ("${PACKAGE}-src-${VERSION}.tar.xz", "8882ab65831df9a2be4f301b5daaf427e29d14d2");
         Patch "COPYRIGHT.gz";
         Patch "configure.ac";
       ]

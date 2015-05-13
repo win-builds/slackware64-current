@@ -1,10 +1,10 @@
     let libmpc = add (name, variant)
       ~dir
       ~dependencies:[]
-      ~version:"0.8.2"
-      ~build:2
+      ~version:"1.0.3"
+      ~build:1
       ~sources:[
-        Tarball ("mpc-${VERSION}.tar.xz", "1a8a84a04aef025b690cbbdd299e745dd7416514");
+        Tarball ("mpc-${VERSION}.tar.xz", "e67917cddc7adf8defa4ebf473dee495e8118552");
       ]
     in
 

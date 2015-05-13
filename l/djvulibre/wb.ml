@@ -2,7 +2,7 @@
       ~dir
       ~dependencies:[]
       ~version:"3.5.25.3"
-      ~build:2
+      ~build:3
       ~sources:[
         Tarball ("${PACKAGE}-${VERSION}.tar.xz", "66e3f4f2c5db863eb5a32ff31d4b01faaa5e1916");
         Patch "patches/0047-djvused-added-missing-command-remove-outline.patch";

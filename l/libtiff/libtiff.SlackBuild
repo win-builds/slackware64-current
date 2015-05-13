@@ -29,6 +29,8 @@ CWD=$(pwd)
 TMP=${TMP:-/tmp}
 PKG=$TMP/package-libtiff
 
+set -e
+
 rm -rf $PKG
 mkdir -p $PKG
 cd $TMP

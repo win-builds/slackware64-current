@@ -22,24 +22,16 @@
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 PKGNAM=dbus
-VERSION=${VERSION:-$(echo $PKGNAM-*.tar.gz | cut -d - -f 2 | rev | cut -f 3- -d . | rev)}
+VERSION=${VERSION:-$(echo $PKGNAM-*.tar.?z* | cut -d - -f 2 | rev | cut -f 3- -d . | rev)}
 BUILD=${BUILD:-1}
 
 NUMJOBS=${NUMJOBS:-" -j7 "}
 
-# Automatically determine the architecture we're building on:
-if [ -z "$ARCH" ]; then
-  case "$( uname -m )" in
-    i?86) export ARCH=i486 ;;
-    arm*) export ARCH=arm ;;
-    # Unless $ARCH is already set, use uname -m for all other archs:
-       *) export ARCH=$( uname -m ) ;;
-  esac
-fi
-
 CWD=$(pwd)
 TMP=${TMP:-/tmp}
 PKG=$TMP/package-$PKGNAM
+
+set -e
 
 rm -rf $PKG
 mkdir -p $TMP $PKG
@@ -51,9 +43,6 @@ chown -R root:root .
 chmod -R u+w,go+r-w,a-s .
 
 # zcat $CWD/dbus-1.6.x-allow_root_globally.diff.gz | patch -p1 --verbose || exit 1
-
-# !PATCH
-sed -i '/THREAD_LIBS="$THREAD_LIBS -lrt"/ s/ -lrt//' configure
 
 CFLAGS="-O2" \
 CXXFLAGS="-O2" \
