@@ -74,6 +74,8 @@ CWD=$(pwd)
 TMP=${TMP:-/tmp}
 PKG=$TMP/package-binutils
 
+set -e
+
 rm -rf $PKG
 mkdir -p $TMP $PKG
 
