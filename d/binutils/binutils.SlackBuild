@@ -131,6 +131,7 @@ make $NUMJOBS || make || exit 1
 make install DESTDIR=$PKG || exit 1
 
 # "make install" skips this, but binutils.spec doesn't.  Sneaky, huh?
+mkdir $PKG/${PREFIX}/include
 cp -a include/libiberty.h $PKG/${PREFIX}/include/libiberty.h
 
 # Differentiate between BSD strings and GNU strings
