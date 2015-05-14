@@ -1,6 +1,6 @@
     let lcms = add (name, variant)
       ~dir
-      ~dependencies:[ zlib; libtiff; libjpeg ]
+      ~dependencies:[ zlib; libtiff; libjpeg_turbo ]
       ~version:"1.19"
       ~build:2
       ~sources:[

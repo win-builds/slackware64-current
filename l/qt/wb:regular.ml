@@ -1,6 +1,6 @@
     let qt = add (name, variant)
       ~dir
-      ~dependencies:[ icu4c; zlib; sqlite; pcre; libpng; libjpeg; harfbuzz; dbus; openssl;
+      ~dependencies:[ icu4c; zlib; sqlite; pcre; libpng; libjpeg_turbo; harfbuzz; dbus; openssl;
         (* freetype; (* build with -system-freetype is broken and probably unsupported *) *)
         (* win_iconv (* disabled by default in the build *) *)
         (* giflib (* Qt never uses the sytem one! *) *)

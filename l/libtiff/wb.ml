@@ -1,6 +1,6 @@
     let libtiff = add (name, variant)
       ~dir
-      ~dependencies:[ libjpeg ]
+      ~dependencies:[ libjpeg_turbo ]
       ~version:"4.0.4beta"
       ~build:1
       ~sources:[

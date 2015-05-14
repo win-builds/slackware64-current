@@ -1,6 +1,6 @@
     let gegl = add (name, variant)
       ~dir
-      ~dependencies:[ pango; cairo; libpng; gdk_pixbuf2; glib2; lua; babl; libjpeg ]
+      ~dependencies:[ pango; cairo; libpng; gdk_pixbuf2; glib2; lua; babl; libjpeg_turbo ]
       ~version:"0.2.0"
       ~build:1
       ~sources:[

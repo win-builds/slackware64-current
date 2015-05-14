@@ -1,6 +1,6 @@
     let gst1_plugins_good = add (name, variant)
       ~dir
-      ~dependencies:[ orc; cairo; flac; gdk_pixbuf2; libpng; libjpeg ]
+      ~dependencies:[ orc; cairo; flac; gdk_pixbuf2; libpng; libjpeg_turbo ]
       ~version:"1.2.2"
       ~build:1
       ~sources:[
