@@ -59,7 +59,7 @@ make install DESTDIR=$PKG || exit 1
 mkdir -p $PKG/${PREFIX}/doc/giflib-$VERSION
 
 cp -a \
-  AUTHORS BUGS COPYING DEVELOPERS INSTALL NEWS ONEWS README TODO \
+  AUTHORS BUGS COPYING INSTALL NEWS README TODO \
   $PKG/${PREFIX}/doc/giflib-$VERSION
 cp -a doc $PKG/${PREFIX}/doc/giflib-$VERSION/html
 rm $PKG/${PREFIX}/doc/giflib-$VERSION/html/Makefile*
