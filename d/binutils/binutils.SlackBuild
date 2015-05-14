@@ -173,8 +173,7 @@ gzip -9 $PKG/${PREFIX}/info/*
 
 mkdir -p $PKG/${PREFIX}/doc/binutils-$VERSION
 cp \
-  $CWD/release.binutils-* \
-  COPYING* ChangeLog.linux MAI* README* \
+  COPYING* ChangeLog* MAI* README* \
   $PKG/${PREFIX}/doc/binutils-$VERSION
 
 # If there's a ChangeLog, installing at least part of the recent history
