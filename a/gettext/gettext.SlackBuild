@@ -37,7 +37,7 @@ rm -rf $PKG
 mkdir -p $TMP $PKG
 cd $TMP
 rm -rf gettext-$VERSION
-tar xvf $CWD/gettext-$VERSION.tar.gz || exit 1
+tar xvf $CWD/gettext-$VERSION.tar.?z* || exit 1
 cd gettext-$VERSION
 chown -R root:root .
 find . \
