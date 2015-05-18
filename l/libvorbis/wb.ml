@@ -4,7 +4,7 @@
       ~version:"1.3.5"
       ~build:1
       ~sources:[
-        Tarball ("${PACKAGE}-${VERSION}.tar.xz", "b99724acdf3577982b3146b9430d765995ecf9e1");
+        Tarball ("${PACKAGE}-${VERSION}.tar.xz", "7b4cdd4a73fadfed457ae40984cb0cc91146b300");
       ]
     in
 
