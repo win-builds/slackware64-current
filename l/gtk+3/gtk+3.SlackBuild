@@ -46,11 +46,6 @@ find . \
   \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
   -exec chmod 644 {} \;
 
-patch -p1 --verbose < $CWD/correctly-generate-def-files-again.patch
-
-libtoolize --copy --force
-autoreconf -vif
-
 #! PATCH
 if [ x"${HOST_TRIPLET}" != x"${BUILD_TRIPLET}" ]; then
   echo 'export PKG_CONFIG_PATH=/usr/local/lib64/pkgconfig:/usr/lib64/pkgconfig:/usr/local/lib64/pkgconfig; export PKG_CONFIG_LIBDIR=; exec pkg-config $@' \
@@ -74,6 +69,11 @@ CFLAGS="-O2" \
   --build=${BUILD_TRIPLET} \
   --host=${HOST_TRIPLET}
 #  --enable-gtk-doc-html=no \
+
+#! PATCH
+printf "I'm a lumberjack and I'm OK.\n" >> util/extract_strings-extract-strings.o
+printf "#!/bin/sh\nI'm an executable that is never called. 1>&2\n" >> util/extract-strings.exe
+chmod +x util/extract-strings.exe
 
 make ${NUMJOBS} || make || exit 1
 
