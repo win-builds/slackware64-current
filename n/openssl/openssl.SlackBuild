@@ -30,21 +30,8 @@ TMP=${TMP:-/tmp}
 VERSION=${VERSION:-$(echo openssl-*.tar.gz | rev | cut -f 3- -d . | cut -f 1 -d - | rev)}
 BUILD=${BUILD:-1}
 
-# Automatically determine the architecture we're building on:
-if [ -z "$ARCH" ]; then
-  case "$( uname -m )" in
-    i?86) export ARCH=i486 ;;
-    arm*) export ARCH=arm ;;
-    # Unless $ARCH is already set, use uname -m for all other archs:
-       *) export ARCH=$( uname -m ) ;;
-  esac
-fi
-
 PKG1=$TMP/package-openssl
 NAME1=openssl-$VERSION-$ARCH-$BUILD
-
-# Parallel build doesn't link properly.
-#NUMJOBS=${NUMJOBS:--j6}
 
 # So that ls has the right field counts for parsing...
 export LC_ALL=C
@@ -194,12 +181,12 @@ mkdir -p ${PREFIX}/doc/openssl-$VERSION
   # If there's a CHANGES file, installing at least part of the recent history
   # is useful, but don't let it get totally out of control:
   if [ -r CHANGES ]; then
-    DOCSDIR=$(echo $PKG1/usr/doc/*-$VERSION)
+    DOCSDIR=$(echo $PKG1/${PREFIX}/doc/*-$VERSION)
     cat CHANGES | head -n 2000 > $DOCSDIR/CHANGES
     touch -r CHANGES $DOCSDIR/CHANGES
   fi
-  find $PKG1/usr/doc/openssl-$VERSION -type d -exec chmod 755 {} \;
-  find $PKG1/usr/doc/openssl-$VERSION -type f -exec chmod 644 {} \;
+  find $PKG1/${PREFIX}/doc/openssl-$VERSION -type d -exec chmod 755 {} \;
+  find $PKG1/${PREFIX}/doc/openssl-$VERSION -type f -exec chmod 644 {} \;
 )
 
 cat ${CWD}/openssl.yypkg.script | sed \

@@ -63,7 +63,7 @@ find $PKG | xargs file | egrep -e "executable|shared object" \
 
 cp -a \
   AUTHORS CHANGES COPYING README \
-  $PKG/usr/doc/libogg-$VERSION
+  $PKG/${PREFIX}/doc/libogg-$VERSION
 
 cat ${CWD}/libogg.yypkg.script | sed \
   -e "s/%{PKG}/libogg/" \

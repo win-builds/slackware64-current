@@ -68,8 +68,8 @@ find $PKG | xargs file | egrep "executable|shared object" \
   | xargs ${HOST_STRIP} --strip-unneeded 2> /dev/null
 
 # Compress and if needed symlink the man pages:
-if [ -d $PKG/usr/man ]; then
-  ( cd $PKG/usr/man
+if [ -d $PKG/${PREFIX}/man ]; then
+  ( cd $PKG/${PREFIX}/man
     for manpagedir in $(find . -type d -name "man*") ; do
       ( cd $manpagedir
         for eachpage in $( find . -type l -maxdepth 1) ; do
@@ -83,8 +83,8 @@ if [ -d $PKG/usr/man ]; then
 fi
 
 # Compress info files, if any:
-if [ -d $PKG/usr/info ]; then
-  ( cd $PKG/usr/info
+if [ -d $PKG/${PREFIX}/info ]; then
+  ( cd $PKG/${PREFIX}/info
     rm -f dir
     gzip -9 *
   )

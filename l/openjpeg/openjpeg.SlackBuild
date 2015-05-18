@@ -85,10 +85,10 @@ cd -
 mkdir -p $PKG/${PREFIX}/include/openmj2-2.1
 install -m 644 src/lib/openmj2/openjpeg.h $PKG/${PREFIX}/include/openmj2-2.1/
 
-mkdir -p $PKG/usr/man
-cp -r doc/man/* $PKG/usr/man/
+mkdir -p $PKG/${PREFIX}/man
+cp -r doc/man/* $PKG/${PREFIX}/man/
 
-find $PKG/usr/man -type f -exec gzip -9 {} \;
+find $PKG/${PREFIX}/man -type f -exec gzip -9 {} \;
 
 mv $PKG/${PREFIX}/lib${LIBDIRSUFFIX}/*.dll $PKG/${PREFIX}/bin
 
