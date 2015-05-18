@@ -49,6 +49,9 @@ find . \
 #! PATCH
 sed -i 's/libavformat libavcodec/\0 libavutil/g' configure
 
+#! PATCH
+patch --verbose -p1 -i $CWD/gegl-0.2.0-ffmpeg2-1.patch
+
 CFLAGS="-O2" \
 ./configure \
   --prefix=/${PREFIX} \
