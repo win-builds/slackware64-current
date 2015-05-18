@@ -69,6 +69,11 @@ find -name 'Makefile' \
 make -j7 || make V=1
 make install DESTDIR=$PKG
 
+if [ -n "${LIBDIRSUFFIX}" ]; then
+  mv $PKG/${PREFIX}/lib/* $PKG/${PREFIX}/lib${LIBDIRSUFFIX}
+  rm -r $PKG/${PREFIX}/lib
+fi
+
 # Strip binaries:
 ( cd $PKG
   find . | xargs file | egrep "executable|shared object" \
