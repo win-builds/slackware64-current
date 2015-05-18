@@ -42,24 +42,29 @@ cd pkg-config-$VERSION
 chown -R root:root .
 chmod -R u+w,go+r-w,a-s .
 
-CFLAGS="-O2" \
-./configure \
-  --prefix=/${PREFIX} \
-  --libdir=/${PREFIX}/lib${LIBDIRSUFFIX} \
-  --mandir=/${PREFIX}/man \
-  --docdir=/${PREFIX}/doc/pkg-config-$VERSION \
-  ${WITH_INSTALLED_GLIB} \
-  --host=${HOST_TRIPLET} \
-  --build=${BUILD_TRIPLET}
+if [ -z "${ONLY_PKG_M4}" ]; then
+  CFLAGS="-O2" \
+  ./configure \
+    --prefix=/${PREFIX} \
+    --libdir=/${PREFIX}/lib${LIBDIRSUFFIX} \
+    --mandir=/${PREFIX}/man \
+    --docdir=/${PREFIX}/doc/pkg-config-$VERSION \
+    ${WITH_INSTALLED_GLIB} \
+    --host=${HOST_TRIPLET} \
+    --build=${BUILD_TRIPLET}
 
-make $NUMJOBS || make
-make install DESTDIR=$PKG
+  make $NUMJOBS || make
+  make install DESTDIR=$PKG
 
-find $PKG | xargs file | egrep "executable|shared object" \
-  | grep ${HOST_EXE_FORMAT} | cut -f 1 -d : \
-  | xargs ${HOST_STRIP} --strip-unneeded 2> /dev/null
+  find $PKG | xargs file | egrep "executable|shared object" \
+    | grep ${HOST_EXE_FORMAT} | cut -f 1 -d : \
+    | xargs ${HOST_STRIP} --strip-unneeded 2> /dev/null
 
-gzip -9 $PKG/${PREFIX}/man/man?/*.?
+  gzip -9 $PKG/${PREFIX}/man/man?/*.?
+else
+  mkdir -p $PKG/${PREFIX}/share/aclocal
+  cp pkg.m4 $PKG/${PREFIX}/share/aclocal
+fi
 
 mkdir -p $PKG/${PREFIX}/doc/pkg-config-$VERSION
 cp -a AUTHORS COPYING NEWS README $PKG/${PREFIX}/doc/pkg-config-$VERSION
