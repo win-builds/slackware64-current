@@ -46,6 +46,9 @@ find . \
  \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
  -exec chmod 644 {} \;
 
+#! PATCH
+sed -i 's/libavformat libavcodec/\0 libavutil/g' configure
+
 CFLAGS="-O2" \
 ./configure \
   --prefix=/${PREFIX} \
