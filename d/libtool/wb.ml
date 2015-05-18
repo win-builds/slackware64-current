@@ -6,4 +6,5 @@ let libtool = add (name, variant)
   ~sources:[
     Tarball ("${PACKAGE}-${VERSION}.tar.xz", "3e7504b832eb2dd23170c91b6af72e15b56eb94e")
   ]
+  ~native_deps:[ "libtool" ]
 in

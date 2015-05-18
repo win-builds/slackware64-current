@@ -6,4 +6,5 @@ let automake = add (name, variant)
   ~sources:[
     Tarball ("${PACKAGE}-${VERSION}.tar.xz", "2ced676f6b792a95c5919243f81790b1172c7f5b")
   ]
+  ~native_deps:[ "automake" ]
 in
