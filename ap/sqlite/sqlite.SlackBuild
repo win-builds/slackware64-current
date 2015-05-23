@@ -68,14 +68,19 @@ find . \
  \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
  -exec chmod 644 {} +
 
-sed -i -e 's;sqlite3.c: .target_source $(TOP)/tool/mksqlite3c.tcl;\0 sqlite3.h;' Makefile.in
+# !PATCH
+sed -i \
+  -e 's;sqlite3.c: .target_source $(TOP)/tool/mksqlite3c.tcl;\0 sqlite3.h;' \
+  Makefile.in
 
+# !PATCH
 sed -i \
   -e '/BEXE = @BUILD_EXEEXT@/ d' \
   -e 's/\<BEXE\>/TEXE/g' \
   -e 's/LTLINK = $(LIBTOOL) --mode=link/\0 --tag=CC/' \
   Makefile.in
 
+# !PATCH
 cp $CWD/configure.ac .
 
 aclocal -I /usr/share/aclocal --force --install --verbose
