@@ -1,12 +1,14 @@
   let binutils = add (name, variant)
     ~dir
-    ~dependencies:[]
-    ~version:"2.24"
-    ~build:2
+    ~dependencies:binutils_dependencies
+    ~version:"2.25"
+    ~build:1
     ~sources:[
-      Tarball ("binutils-${VERSION}.tar.gz", "1b2bc33003f4997d38fadaa276c1f0321329ec56");
+      Tarball ("binutils-${VERSION}.tar.gz", "f10c64e92d9c72ee428df3feaf349c4ecb2493bd");
       Patch "binutils.export.demangle.h.diff.gz";
       Patch "binutils.no-config-h-check.diff.gz";
-      Patch "binutils-fix-seg-fault-in-strings-on-corrupt-pe.patch";
+      Patch "0001-Add-support-for-absolute-PE-x86-relocations.patch";
+      Patch "0001-Skip-discarded-resource-sections-when-building-a-PE-.patch";
+
     ]
   in
