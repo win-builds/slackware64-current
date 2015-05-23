@@ -130,10 +130,6 @@ make install DESTDIR=$PKG || exit 1
 mkdir $PKG/${PREFIX}/include
 cp -a include/libiberty.h $PKG/${PREFIX}/include/libiberty.h
 
-# Differentiate between BSD strings and GNU strings
-( cd $PKG/${PREFIX}/bin ; mv ${TARGET_TRIPLET}-strings ${TARGET_TRIPLET}-strings-GNU )
-( cd $PKG/${PREFIX}/man/man1 ; mv ${TARGET_TRIPLET}-strings.1 ${TARGET_TRIPLET}-strings-GNU.1 )
-
 # This bombs out when installing on windows since symlinks are not usable.
 # # Move ldscripts to ${PREFIX}/lib${LIBDIRSUFFIX}, and then put symlinks in place
 # mv $PKG/${PREFIX}/${TARGET_TRIPLET}/lib/ldscripts $PKG/${PREFIX}/lib${LIBDIRSUFFIX}
