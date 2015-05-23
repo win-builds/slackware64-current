@@ -83,15 +83,12 @@ sed -i \
 # !PATCH
 cp $CWD/configure.ac .
 
-aclocal -I /usr/share/aclocal --force --install --verbose
-
-libtoolize
-
-autoreconf || exit 1
+AC_CONFIG_MACRO_DIRS='/${PREFIX}/share/aclocal' \
+  autoreconf -fiv
 
 CFLAGS="$SLKCFLAGS" \
-CXXFLAGS="$SLKCFLAGS $(icu-config --cppflags)" \
-LDFLAGS="$(icu-config --ldflags)" \
+CXXFLAGS="$SLKCFLAGS $(/${PREFIX}/bin/icu-config --cppflags)" \
+LDFLAGS="$(/${PREFIX}/bin/icu-config --ldflags)" \
 archive_cmds_need_lc="no" \
 ./configure \
   --prefix=/${PREFIX} \

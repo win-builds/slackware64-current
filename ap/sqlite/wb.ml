@@ -1,6 +1,6 @@
     let sqlite = add (name, variant)
       ~dir
-      ~dependencies:[ icu4c ]
+      ~dependencies:[ icu4c; automake; autoconf; libtool ]
       ~version:"3080900"
       ~build:1
       ~sources:[
