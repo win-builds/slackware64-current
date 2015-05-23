@@ -98,7 +98,7 @@ archive_cmds_need_lc="no" \
   --mandir=/${PREFIX}/man \
   --enable-static=no \
   --disable-tcl \
-  --disable-threadsafe \
+  --enable-threadsafe \
   --enable-tempstore=yes \
   --host=${HOST_TRIPLET} \
   --build=${BUILD_TRIPLET} \
