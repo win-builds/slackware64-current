@@ -48,6 +48,12 @@ find . \
   \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
   -exec chmod 644 {} \;
 
+# !PATCH
+sed -i \
+  -e '1,1 i #include <basetsd.h>' \
+  -e '/^#ifndef XMD_H\>/ s/XMD_H/_BASETSD_H_/' \
+  jmorecfg.h
+
 # Configure:
 CFLAGS="-O2" \
 ./configure \
