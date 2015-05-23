@@ -28,21 +28,13 @@ SRCVER=${SRCVER:-$(echo $PKGNAM-*.tar.xz | rev | cut -f 2- -d . | cut -f 2 -d - 
 VERSION=$(echo $SRCVER | tr _ .)
 BUILD=${BUILD:-2}
 
-# Automatically determine the architecture we're building on:
-if [ -z "$ARCH" ]; then
-  case "$( uname -m )" in
-    i?86) ARCH=i486 ;;
-    arm*) ARCH=arm ;;
-    # Unless $ARCH is already set, use uname -m for all other archs:
-       *) ARCH=$( uname -m ) ;;
-  esac
-fi
-
 NUMJOBS=${NUMJOBS:--j6}
 
 CWD=$(pwd)
 TMP=${TMP:-/tmp}
 PKG=$TMP/package-icu4c
+
+set -e
 
 rm -rf $PKG
 mkdir -p $TMP $PKG $OUTPUT
@@ -75,7 +67,7 @@ sed -i \
     --disable-static \
     --sysconfdir=/${PREFIX}/etc \
     --localstatedir=/${PREFIX}/var \
-    --build=$ARCH-slackware-linux || exit 1
+    --build=${BUILD_TRIPLET} || exit 1
   make $NUMJOBS || make || exit 1
 ) || exit 1
 
@@ -95,7 +87,7 @@ cd source/
     --disable-samples \
     --host=${HOST_TRIPLET} \
     --with-cross-build=${TMP}/icu-native/source \
-    --build=$ARCH-slackware-linux || exit 1
+    --build=${BUILD_TRIPLET} || exit 1
 
   make $NUMJOBS || make || exit 1
   make install DESTDIR=$PKG || exit 1
