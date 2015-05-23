@@ -51,11 +51,19 @@ find icu \
 
 cp -a icu icu-native
 
+# !PATCH
 sed -i \
-  -e '/^IMPORT_LIB_EXT = \.lib$/ s/lib/dll.a/' \
   -e '/^LIBPREFIX=$/ s/$/lib/' \
-  -e '/^LIBICU = \$(STATIC_PREFIX_WHEN_USED)/ s/\$(STATIC_PREFIX_WHEN_USED)/lib/' \
+  -e '/^FINAL_SO_TARGET=/ s/\$(SO_TARGET_VERSION_MAJOR)/-1/' \
+  -e '/^SHLIB\./ s/\<lib\>//' \
+  -e '/^SHLIB\./ s/\$(SO_TARGET_VERSION_MAJOR)/-1/' \
+  -e '/^FINAL_IMPORT_LIB = / s/\<lib\>//' \
+  -e '/^LIBICU = / s/= /= lib/' \
+  -e '/^SO_TARGET_VERSION_SUFFIX = $(SO_TARGET_VERSION_MAJOR)/ s/$(SO_TARGET_VERSION_MAJOR)/-1/' \
+  -e '/^#SH#ICULIBS_COMMON_LIB_NAME=/ s/\.\${SO}"$/.dll.a"/' \
   icu/source/config/mh-mingw*
+
+find icu/source -name 'Makefile.in' -exec sed -i '/^ALL_SO_TARGETS = / s/\$(SO_TARGET) //' {} +
 
 (cd icu-native/source/ &&
   CFLAGS="-O0" CXXFLAGS="-O0" \
@@ -95,7 +103,7 @@ cd -
 
 (cd ${PKG}/${PREFIX} && mv lib${LIBDIRSUFFIX}/lib*.dll bin)
 
-sed -i '/^Libs:/ s/51//g' ${PKG}/${PREFIX}/lib${LIBDIRSUFFIX}/pkgconfig/*.pc
+sed -i '/^Libs:/ s/-1\>//g' ${PKG}/${PREFIX}/lib${LIBDIRSUFFIX}/pkgconfig/*.pc
 
 find $PKG | xargs file | egrep "executable|shared object" \
   | grep ${HOST_EXE_FORMAT} | cut -f 1 -d : \
