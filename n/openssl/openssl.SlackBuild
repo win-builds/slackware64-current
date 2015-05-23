@@ -125,11 +125,11 @@ find doc -name '*.pod' -exec sed -i 's/=item \([0-9]\+\)/=item Z<>\1/' {} +
 set -x
 export CROSS_COMPILE="${HOST_TRIPLET}-"
 
-(make $NUMJOBS depend || make depend) || exit 1
+(make -j1 depend || make -j1 depend) || exit 1
 
-(make $NUMJOBS; make) || exit 1
+(make -j1; make -j1) || exit 1
 
-make install INSTALL_PREFIX=$PKG1 || exit 1
+make -j1 install INSTALL_PREFIX=$PKG1
 cp lib{crypto,ssl}-1.0.0.dll $PKG1/${PREFIX}/bin
 
 rm $PKG1/${PREFIX}/lib${LIBDIRSUFFIX}/lib{crypto,ssl}.a
