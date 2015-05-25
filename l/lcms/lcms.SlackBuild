@@ -48,6 +48,9 @@ find . \
 
 patch -p1 --verbose < "${CWD}/lcms1.19-avoid-buffer-overflows-CVE-2013-4276.patch"
 
+# !PATCH
+sed -i 's/\<boolean\>/jpeg_boolean/g' jpegicc/iccjpeg.{c,h}
+
 CFLAGS="-O2" \
 ./configure \
   --prefix=/${PREFIX} \

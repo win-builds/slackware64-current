@@ -54,6 +54,12 @@ sed -i \
   -e '/^#ifndef XMD_H\>/ s/XMD_H/_BASETSD_H_/' \
   jmorecfg.h
 
+# !PATCH
+find \( -name '*.c' -o -name '*.h' \) -exec sed -i 's/\<boolean\>/jpeg_boolean/g' {} +
+sed -i \
+  -e 's/^#ifndef HAVE_BOOLEAN$/#if 1/' \
+  jmorecfg.h
+
 # Configure:
 CFLAGS="-O2" \
 ./configure \

@@ -58,6 +58,8 @@ for i in ${CWD}/patches/*.patch; do
   patch -p1 -i $i || exit 1
 done
 
+sed -i 's/\<boolean\>/jpeg_boolean/g' libdjvu/JPEGDecoder.cpp
+
 # The qt stuff really isn't needed here, as the viewer won't build
 # with qt4 (and djview4 is now a separate package).
 # It won't matter, as we only need the headers and libs

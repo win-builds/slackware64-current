@@ -48,6 +48,9 @@ find . \
  \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
     -exec chmod 644 {} \;
 
+# !PATCH
+sed -i 's/\<boolean\>/jpeg_boolean/g' ext/jpeg/gstjpeg{enc,dec}.c
+
 CFLAGS="-O2" \
 CXXFLAGS="-O2" \
 ./configure \
@@ -61,7 +64,7 @@ CXXFLAGS="-O2" \
   --build=${BUILD_TRIPLET} \
   --host=${HOST_TRIPLET}
 
-make $NUMJOBS
+make $NUMJOBS || make -j1
 make install DESTDIR=$PKG
 
 find $PKG | xargs file | egrep -e "executable|shared object" \

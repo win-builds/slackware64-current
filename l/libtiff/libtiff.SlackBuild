@@ -45,6 +45,8 @@ find . \
   \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
   -exec chmod 644 {} \;
 
+sed -i 's/\<boolean\>/jpeg_boolean/g' libtiff/tif_{jpeg,ojpeg}.c
+
 CFLAGS="-O2" \
 LDFLAGS="-L/${PREFIX}/lib${LIBDIRSUFFIX}" \
 ./configure \
